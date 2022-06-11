@@ -1,0 +1,123 @@
+﻿<UserControl x:Class="DaocLauncher.Dashboard"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DaocLauncher"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ScrollViewer>
+    <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Accounts" FontSize="16" HorizontalAlignment="Center"></TextBlock>
+            <ListView x:Name="lstMyAccounts" ItemsSource="{Binding Path=Accounts}">
+                <ListView.View>
+                    <GridView x:Name="GridView2">
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding Name}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Name"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding DefaultTag}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Default Tag"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox Height="24" IsEditable="False" FontSize="16"
+                                          ItemsSource="{Binding ServerNames, RelativeSource={RelativeSource AncestorType=local:Dashboard}}"
+                                          SelectedItem="{Binding DefaultServer}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Default Server"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="70">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16"
+                                                Command="{Binding Path=LaunchMyAcct, RelativeSource={RelativeSource AncestorType={x:Type local:Dashboard}} }" CommandParameter="{Binding .}"></Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Characters" FontSize="16" HorizontalAlignment="Center"></TextBlock>
+            <ListView x:Name="lstCharacters" ItemsSource="{Binding Path=AllCharacters}">
+                <ListView.View>
+                    <GridView x:Name="GridView1">
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding Name}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Name"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding Class}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Class"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="130">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding Server}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Server"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="Auto">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="16" Text="{Binding ParentAccountName}"></TextBlock>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            <GridViewColumn.Header>
+                                <TextBlock FontSize="16" FontWeight="Bold" Text="Account"></TextBlock>
+                            </GridViewColumn.Header>
+                        </GridViewColumn>
+                        <GridViewColumn Width="70">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16"
+                                                Command="{Binding Path=LaunchChar, RelativeSource={RelativeSource AncestorType={x:Type local:Dashboard}} }" CommandParameter="{Binding .}"></Button>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
+    </StackPanel>
+    </ScrollViewer>
+</UserControl>
