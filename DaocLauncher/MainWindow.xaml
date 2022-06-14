@@ -38,6 +38,7 @@
                     <MenuItem Header="About" Click="ClickedAbout"></MenuItem>
                 </MenuItem>
             </Menu>
+            <TextBlock x:Name="lblTesting" Text="test"></TextBlock>
         </StackPanel>
         <ContentPresenter x:Name="mainContent" Grid.Row="1" Margin="5,5,5,5" Grid.ColumnSpan="2"/>
     </Grid>
