@@ -22,6 +22,56 @@ namespace DaocLauncher.Helpers
         Win = 0x0008
     }
 
+    public enum HotkeyActionType
+    {
+        AssistActiveWindow, // (group
+        TargetActiveWindow,
+        Pause,         // pause script for x milliseconds
+        SlashCommand, // text
+        GroupCommand, // (group, key, modifier
+        AllKeyCommand, // send a key to all (like sprint f
+        EchoText, // pop an input text box and echo the results to all windows with a /say
+        InviteGroup,  //Invites all windows to a group
+        SlashPrompt, // Will echo the slash command given to all windows
+        Disable, // Toggle, Disable and Enable everything so the user can type normally.  
+        Enable,  // Main use should be to toggle on Enter and /
+        ToggleAllHotkeys,
+    }
+
+    public class HotKeyAction
+    {
+        public string? GroupName { get; set; } // Casters, healers
+        public int? Count { get; set; } // for use with things like pause
+        public VirtualKeyCode? KeyToSend { get; set; } // 1 2
+        public VirtualKeyCode? ModifierKeyToSend { get; set; } // shift alt
+        public string? Text { get; set; } // For things like slash command
+        public HotkeyActionType ActionType { get; set; }
+
+        /// <summary>
+        /// HotKeyAction
+        /// </summary>
+        /// <param name="groupName">Who does this target? eg Casters, Healers, PBAOE</param>
+        /// <param name="count">For things like pause</param>
+        /// <param name="keyToSend">The keyboard key being sent eg 1, 2, F</param>
+        /// <param name="modifierKeyToSend">A modifier key so we can send something like Shift-1 or Alt-f</param>
+        /// <param name="text">For use with things like slash command</param>
+        /// <param name="actionType">From the enum</param>
+        public HotKeyAction(string? groupName, int? count, VirtualKeyCode? keyToSend, VirtualKeyCode? modifierKeyToSend, string? text, HotkeyActionType actionType)
+        {
+            GroupName = groupName;
+            Count = count;
+            KeyToSend = keyToSend;
+            ModifierKeyToSend = modifierKeyToSend;
+            Text = text;
+            ActionType = actionType;
+        }
+
+        public HotKeyAction()
+        {
+            
+        }
+    }
+
     public class HotKey : IDisposable
     {
         [DllImport("user32.dll")]
@@ -35,22 +85,18 @@ namespace DaocLauncher.Helpers
         private bool AmIDisposed = false;
         public Key Key { get; private set; }
         public KeyModifier KeyModifiers { get; private set; }
-        public Action<HotKey> HotKeyAction { get; private set; }
+        public Action<HotKey>? HotKeyAction { get; private set; }
         public int Id { get; set; }
 
-        public HotKey(Key k, KeyModifier keyModifiers, Action<HotKey> action, bool register = true)
+        public HotKey(Key k, KeyModifier keyModifiers)
         {
             Key = k;
-            KeyModifiers = keyModifiers;
-            HotKeyAction = action;
-            if (register)
-            {
-                Register();
-            }
+            KeyModifiers = keyModifiers;            
         }
 
-        public bool Register()
+        public bool Register(Action<HotKey> action)
         {
+            HotKeyAction = action;
             int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
             Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
             bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);

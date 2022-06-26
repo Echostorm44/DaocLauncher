@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +24,17 @@ namespace DaocLauncher
     /// </summary>
     public partial class Dashboard : UserControl
     {
+        [DllImport("user32.dll")]
+        static extern IntPtr GetActiveWindow();
+        [DllImport("user32.dll")]
+        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+        public Dictionary<string, IntPtr> LoadedWindows { get; set; }
+        public MacroSet ActiveMacroSet { get; set; }
+        private object macroLock = new object();
+        // TODO google code cave method for C# dll injection
+
+        public List<string> MacroSets { get; set; }
         public List<DaocCharacter> AllCharacters { get; set; }
         public List<Server> Servers { get; set; }
         public List<string> ServerNames { get; set; }
@@ -31,6 +43,8 @@ namespace DaocLauncher
         public ICommand LaunchMyAcct { get; private set; }
         public Dashboard()
         {
+            LoadedWindows = new Dictionary<string, IntPtr>();
+            // TODO Load MacroSets
             AllCharacters = GeneralHelpers.LoadCharactersFromDisk() ?? new List<DaocCharacter>();
             Servers = GeneralHelpers.LoadServerListFromDisk()?.Servers ?? new List<Server>();
             ServerNames = Servers.Select(a => a.Name).ToList();
@@ -82,7 +96,8 @@ namespace DaocLauncher
                 return;
             }
             var realmNumber = classLookup[selectedChar.Class];
-            GeneralHelpers.LaunchDaoc(selectedChar.Name, accountData.Name, accountData.Password, serverData.IP, serverData.ID, selectedChar.Name, realmNumber);
+            var windowHandle = GeneralHelpers.LaunchDaoc(selectedChar.Name, accountData.Name, accountData.Password, serverData.IP, serverData.ID, selectedChar.Name, realmNumber);
+            LoadedWindows.Add(selectedChar.Name, windowHandle);
         }
 
         void LaunchMyAccountClicked(object choice)
@@ -102,7 +117,112 @@ namespace DaocLauncher
                 return;
             }
             GeneralHelpers.SaveAccountListToDisk(Accounts);// Save the default server if it changed
-            GeneralHelpers.LaunchDaoc(selectedAccount.DefaultTag, selectedAccount.Name, selectedAccount.Password, serverData.IP, serverData.ID, "", "");
+            var windowHandle = GeneralHelpers.LaunchDaoc(selectedAccount.DefaultTag, selectedAccount.Name, selectedAccount.Password, serverData.IP, serverData.ID, "", "");
+            LoadedWindows.Add(selectedAccount.DefaultTag, windowHandle);
         }
+
+        private void btnToggleMacroSet_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OnHotKeyHandler(HotKey hotKey)
+        {            
+            // Throw this into it's own thread
+            
+            
+            lock (macroLock)// Prevent things from getting too crazy
+            {
+                if (!ActiveMacroSet.HotKeyCollection.TryGetValue(hotKey, out var targetActions))
+                {
+                    return;
+                }
+                IntPtr windowToReturnTo = GetActiveWindow();
+
+                foreach (var act in targetActions)
+                {
+                    switch (act.ActionType)
+                    {
+                        case HotkeyActionType.AssistActiveWindow:
+                            {
+                                // First find all the windows we need to send the command to based on the group
+                                //LoadedWindows
+                                if (string.IsNullOrEmpty(act.GroupName))
+                                {
+                                    continue;                                    
+                                }
+                                if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                {
+                                    
+                                }                                
+                            }
+                            break;
+                        case HotkeyActionType.TargetActiveWindow:
+                            { 
+                            
+                            }
+                            break;
+                        case HotkeyActionType.Pause:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.SlashCommand:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.GroupCommand:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.AllKeyCommand:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.EchoText:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.InviteGroup:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.SlashPrompt:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.Disable:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.Enable:
+                            {
+
+                            }
+                            break;
+                        case HotkeyActionType.ToggleAllHotkeys:
+                            {
+
+                            }
+                            break;
+                    }
+                }
+            }
+
+
+            //IntPtr windowToFind = FindWindow("DAoCMWC", "Buddyblocker");
+            //IntPtr windowToReturnTo = GetActiveWindow();            
+            //SendKeysTo keySender = new SendKeysTo();
+            //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_1, null, windowToReturnTo);
+            //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, windowToReturnTo);
+        }
+
     }
 }

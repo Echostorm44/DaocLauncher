@@ -19,6 +19,10 @@ namespace DaocLauncher.Helpers
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
         [DllImport("user32.dll")]
         public static extern bool SetWindowText(IntPtr hWnd, string lpString);
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        static extern int GetWindowTextLength(IntPtr hWnd);
 
         public enum ConfigFileType
         {
@@ -252,9 +256,10 @@ namespace DaocLauncher.Helpers
         /// <param name="serverID"></param>
         /// <param name="characterName"></param>
         /// <param name="realmNumber">1 Alb; 2 Mid; 3 Hib</param>
-        public static void LaunchDaoc(string windowTitle, string userName, string password, string serverIP, string serverID, string characterName, string realmNumber)
+        public static IntPtr LaunchDaoc(string windowTitle, string userName, string password, string serverIP, string serverID, string characterName, string realmNumber)
         {
             string gameFolder = LoadGeneralSettingsFromDisk().PathToGameDll.Replace("game.dll", "");
+            IntPtr windowHandle = IntPtr.Zero;
             try
             {
                 using (Process process = new Process())
@@ -267,9 +272,9 @@ namespace DaocLauncher.Helpers
                     process.StartInfo.RedirectStandardOutput = false;
                     process.Start();
                     Thread.Sleep(500);
-                    var win = FindWindow("DAoCMWC", "Dark Age of Camelot © 2001-2021 Electronic Arts Inc. All Rights Reserved.");
-                    SpinWait.SpinUntil(() => win != IntPtr.Zero);
-                    SetWindowText(win, windowTitle);                    
+                    windowHandle = FindWindow("DAoCMWC", "Dark Age of Camelot © 2001-2021 Electronic Arts Inc. All Rights Reserved.");
+                    SpinWait.SpinUntil(() => windowHandle != IntPtr.Zero);
+                    SetWindowText(windowHandle, windowTitle);                    
                 }
                 // We look for the mutant handles that prevents more than 2 instances and kill them
                 MutantHunter hunt = new MutantHunter();
@@ -279,6 +284,15 @@ namespace DaocLauncher.Helpers
             {  
                 
             }
+            return windowHandle;
+        }
+
+        public static string GetWindowTitleText(IntPtr windowHandle)
+        {
+            int length = GetWindowTextLength(windowHandle);
+            StringBuilder sb = new StringBuilder(length + 1);
+            GetWindowText(windowHandle, sb, sb.Capacity);
+            return sb.ToString();
         }
 
         #region TODO

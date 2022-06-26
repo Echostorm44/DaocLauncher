@@ -8,6 +8,13 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <ScrollViewer>
     <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Macro Sets" FontSize="16" Margin="10,0"></TextBlock>
+                <ComboBox Name="ddlMacroSets" MinWidth="250" FontSize="14" ItemsSource="{Binding MacroSets}">                    
+                </ComboBox>
+                <Button Name="btnToggleMacroSet" Content="Run Macro Set" Margin="10,0" Click="btnToggleMacroSet_Click"></Button>
+                <TextBlock Name="lblMacoState" Text="No Macros Active" FontSize="16"></TextBlock>
+            </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Accounts" FontSize="16" HorizontalAlignment="Center"></TextBlock>
             <ListView x:Name="lstMyAccounts" ItemsSource="{Binding Path=Accounts}">

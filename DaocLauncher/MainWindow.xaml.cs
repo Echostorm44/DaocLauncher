@@ -82,11 +82,16 @@ namespace DaocLauncher
         HotKey hotKey;
         private void ClickedAbout(object sender, RoutedEventArgs e)
         {
-            hotKey = new HotKey(Key.F9, KeyModifier.None, OnHotKeyHandler);
+            hotKey = new HotKey(Key.F9, KeyModifier.None);
+            hotKey.Register(OnHotKeyHandler);
 
         }
         [DllImport("user32.dll")]
+        static extern IntPtr GetActiveWindow();
+
+        [DllImport("user32.dll")]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
         private void OnHotKeyHandler(HotKey hotKey)
         {
             IntPtr WindowToFind = FindWindow("DAoCMWC", "Buddyblocker");
