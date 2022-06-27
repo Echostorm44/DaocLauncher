@@ -32,6 +32,7 @@ namespace DaocLauncher
         public Dictionary<string, IntPtr> LoadedWindows { get; set; }
         public MacroSet ActiveMacroSet { get; set; }
         private object macroLock = new object();
+        private bool macrosAreSleeping = false;
         // TODO google code cave method for C# dll injection
 
         public List<string> MacroSets { get; set; }
@@ -128,9 +129,12 @@ namespace DaocLauncher
 
         private void OnHotKeyHandler(HotKey hotKey)
         {            
+            if (macrosAreSleeping)
+            {
+                return;
+            }
             // Throw this into it's own thread
-            
-            
+
             lock (macroLock)// Prevent things from getting too crazy
             {
                 if (!ActiveMacroSet.HotKeyCollection.TryGetValue(hotKey, out var targetActions))
@@ -138,6 +142,11 @@ namespace DaocLauncher
                     return;
                 }
                 IntPtr windowToReturnTo = GetActiveWindow();
+                var activeWindowName = "";
+                if (LoadedWindows.ContainsValue(windowToReturnTo))
+                {
+                    activeWindowName = LoadedWindows.First(a => a.Value == windowToReturnTo).Key;
+                }
 
                 foreach (var act in targetActions)
                 {
@@ -153,7 +162,13 @@ namespace DaocLauncher
                                 }
                                 if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
                                 {
-                                    
+                                    foreach (var name in windowNamesToCheckFor)
+                                    {
+                                        if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                        {
+                                            
+                                        }
+                                    }
                                 }                                
                             }
                             break;

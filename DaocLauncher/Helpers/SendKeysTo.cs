@@ -53,7 +53,7 @@ namespace DaocLauncher.Helpers
                     keybd_event((byte)modiferKey, 0, WM_KEYDOWN, 0); ;
                     Thread.Sleep(1);
                 }
-                SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
+                SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);// TODO try removing the key up and down and see if it still works
                 Thread.Sleep(1);
                 SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
                 Thread.Sleep(1);
@@ -62,6 +62,29 @@ namespace DaocLauncher.Helpers
                 {
                     Thread.Sleep(1);
                     keybd_event((byte)modiferKey, 0, WM_KEYUP, 0);
+                }
+                SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
+                SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
+            }
+        }
+
+        /// <summary>
+        /// Send keys to target window, this one is for putting keys into text box
+        /// </summary>
+        /// <param name="targetWindow">Result of FindWindow or similar</param>
+        /// <param name="key"></param>
+        public void SendThoseKeysSucka(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
+        {
+            lock (sendLock)
+            {
+                SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
+                foreach (var c in keysToSend.ToCharArray())
+                {                    
+                    uint scanCode = MapVirtualKey((uint)c, 0);
+                    uint lParam = (0x00000001 | (scanCode << 16));                    
+                    //SendMessage(targetWindow, WM_KEYDOWN, (uint)c, lParam);
+                    SendMessage(targetWindow, WM_CHAR, (uint)c, lParam);
+                    //SendMessage(targetWindow, WM_KEYUP, (uint)c, lParam);
                 }
                 SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
                 SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);

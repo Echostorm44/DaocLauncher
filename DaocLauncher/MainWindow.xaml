@@ -27,8 +27,8 @@
                     <MenuItem Header="Manage Characters" Click="ClickedEditCharacters"></MenuItem>
                     <MenuItem Header="Manage Teams"></MenuItem>
                 </MenuItem>
-                <MenuItem Header="Hotkeys">
-                    <MenuItem Header="TBD"></MenuItem>
+                <MenuItem Header="Macros">
+                    <MenuItem Header="TBD" Click="ClickedMacros"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Advanced">
                     <MenuItem Header="TBD"></MenuItem>

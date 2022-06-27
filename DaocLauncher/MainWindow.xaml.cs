@@ -70,6 +70,15 @@ namespace DaocLauncher
             mainContent.Content = targetUC;
         }
 
+        private void ClickedMacros(object sender, RoutedEventArgs e)
+        {
+            var soo = (uint)VirtualKeyCode.VK_A;
+            var aoo = (uint)VirtualKeyCode.VK_A;
+            var loo = (uint)'A';
+            UInt16 eoo = 'A';
+            var rooo = "";
+        }
+
         private void OnKeyDownHandler(object sender, KeyEventArgs e)
         {
 
@@ -98,7 +107,8 @@ namespace DaocLauncher
             IntPtr WindowToReturnTo = FindWindow("DAoCMWC", "Elliiee");
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             SendKeysTo keySender = new SendKeysTo();
-            keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.VK_1, null, WindowToReturnTo);
+            keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.RETURN, null, WindowToReturnTo);
+            keySender.SendThoseKeysSucka(WindowToFind, "Simple Text Test", WindowToReturnTo);
             //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, WindowToReturnTo);
         }
 
