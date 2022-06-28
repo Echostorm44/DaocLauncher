@@ -53,7 +53,7 @@ namespace DaocLauncher.Helpers
                     keybd_event((byte)modiferKey, 0, WM_KEYDOWN, 0); ;
                     Thread.Sleep(1);
                 }
-                SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);// TODO try removing the key up and down and see if it still works
+                SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
                 Thread.Sleep(1);
                 SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
                 Thread.Sleep(1);
@@ -73,7 +73,7 @@ namespace DaocLauncher.Helpers
         /// </summary>
         /// <param name="targetWindow">Result of FindWindow or similar</param>
         /// <param name="key"></param>
-        public void SendThoseKeysSucka(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
+        public void SendThoseChatKeysSucka(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
         {
             lock (sendLock)
             {
@@ -81,11 +81,44 @@ namespace DaocLauncher.Helpers
                 foreach (var c in keysToSend.ToCharArray())
                 {                    
                     uint scanCode = MapVirtualKey((uint)c, 0);
-                    uint lParam = (0x00000001 | (scanCode << 16));                    
-                    //SendMessage(targetWindow, WM_KEYDOWN, (uint)c, lParam);
+                    uint lParam = (0x00000001 | (scanCode << 16));              
                     SendMessage(targetWindow, WM_CHAR, (uint)c, lParam);
-                    //SendMessage(targetWindow, WM_KEYUP, (uint)c, lParam);
                 }
+                SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
+                SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
+            }
+        }
+
+
+        public void JustSendKey(IntPtr targetWindow, VirtualKeyCode key)
+        {
+            uint scanCode = MapVirtualKey((uint)key, 0);
+            uint lParam = (0x00000001 | (scanCode << 16));
+            SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
+            Thread.Sleep(1);
+            SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
+            Thread.Sleep(1);
+            SendMessage(targetWindow, WM_KEYUP, (uint)key, lParam);
+        }
+
+        /// <summary>
+        /// Optimized version to prevent using more focus calls than needed to do a chat / command
+        /// </summary>
+        /// <param name="targetWindow">Result of FindWindow or similar</param>
+        /// <param name="key"></param>
+        public void SendChatCommand(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
+        {
+            lock (sendLock)
+            {
+                SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
+                JustSendKey(targetWindow, VirtualKeyCode.RETURN);
+                foreach (var c in keysToSend.ToCharArray())
+                {
+                    uint scanCode = MapVirtualKey((uint)c, 0);
+                    uint lParam = (0x00000001 | (scanCode << 16));
+                    SendMessage(targetWindow, WM_CHAR, (uint)c, lParam);
+                }
+                JustSendKey(targetWindow, VirtualKeyCode.RETURN);
                 SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
                 SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
             }

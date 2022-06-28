@@ -1,0 +1,18 @@
+﻿<Window x:Class="DaocLauncher.TextPrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DaocLauncher"
+        mc:Ignorable="d" Height="200" Width="400" ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
+        Topmost="True" WindowStyle="SingleBorderWindow" SizeToContent="WidthAndHeight">
+    <StackPanel Margin="10">
+        <TextBlock Text="Enter your command:" />
+        <TextBox x:Name="ResponseTextBox" Width="350" KeyDown="ResponseTextBox_KeyDown" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="OK" Click="OKButton_Click" Width="60" Height="20" Margin="10" />
+            <Button Content="Cancel" Click="CancelButton_Click" Width="60" Height="20" Margin="10" />
+        </StackPanel>
+    </StackPanel>
+</Window>
+

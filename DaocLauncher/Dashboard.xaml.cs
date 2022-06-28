@@ -184,7 +184,11 @@ namespace DaocLauncher
                             break;
                         case HotkeyActionType.SlashCommand:
                             {
-
+                                //var dialog = new TextPrompt();
+                                //if (dialog.ShowDialog() == true)
+                                //{
+                                //    keySender.SendChatCommand(WindowToFind, dialog.ResponseText, WindowToReturnTo);
+                                //}
                             }
                             break;
                         case HotkeyActionType.GroupCommand:

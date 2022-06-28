@@ -107,8 +107,21 @@ namespace DaocLauncher
             IntPtr WindowToReturnTo = FindWindow("DAoCMWC", "Elliiee");
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             SendKeysTo keySender = new SendKeysTo();
-            keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.RETURN, null, WindowToReturnTo);
-            keySender.SendThoseKeysSucka(WindowToFind, "Simple Text Test", WindowToReturnTo);
+            var dialog = new TextPrompt();
+            if (dialog.ShowDialog() == true)
+            {
+                keySender.SendChatCommand(WindowToFind, dialog.ResponseText, WindowToReturnTo);
+            }
+
+
+            //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.VK_1, null, WindowToReturnTo);
+            //keySender.SendChatCommand(WindowToFind, "/assist frickk", WindowToReturnTo);
+            //Thread.Sleep(2000);
+            //keySender.SendChatCommand(WindowToFind, "/wave", WindowToReturnTo);
+
+            //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.RETURN, null, WindowToReturnTo);
+            //keySender.SendThoseKeysSucka(WindowToFind, "/assist frickk", WindowToReturnTo);
+            //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.RETURN, null, WindowToReturnTo);
             //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, WindowToReturnTo);
         }
 
