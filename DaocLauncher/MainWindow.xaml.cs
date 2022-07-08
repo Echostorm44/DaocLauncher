@@ -72,20 +72,8 @@ namespace DaocLauncher
 
         private void ClickedMacros(object sender, RoutedEventArgs e)
         {
-            var soo = (uint)VirtualKeyCode.VK_A;
-            var aoo = (uint)VirtualKeyCode.VK_A;
-            var loo = (uint)'A';
-            UInt16 eoo = 'A';
-            var rooo = "";
-        }
-
-        private void OnKeyDownHandler(object sender, KeyEventArgs e)
-        {
-
-            var roo = (uint)e.Key;
-            var foo = (uint)Key.D2;
-            var soo = (uint)VirtualKeyCode.VK_2;
-            var yoo = e.KeyStates;
+            var targetUC = new ManageMacros();
+            mainContent.Content = targetUC;
         }
 
         HotKey hotKey;
@@ -112,8 +100,6 @@ namespace DaocLauncher
             {
                 keySender.SendChatCommand(WindowToFind, dialog.ResponseText, WindowToReturnTo);
             }
-
-
             //keySender.SendThoseKeysSucka(WindowToFind, VirtualKeyCode.VK_1, null, WindowToReturnTo);
             //keySender.SendChatCommand(WindowToFind, "/assist frickk", WindowToReturnTo);
             //Thread.Sleep(2000);

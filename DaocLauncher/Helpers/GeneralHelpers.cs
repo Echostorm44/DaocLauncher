@@ -48,6 +48,31 @@ namespace DaocLauncher.Helpers
             return Encoding.Unicode.GetString(decryptedData);
         }
 
+        public static List<MacroSet> LoadMacroSetsFromDisk()
+        {
+            string fileName = "macrosets.dat";
+            var myMacros = new List<MacroSet>();
+
+            var rawMacros = GetFileContents(fileName, true);
+            if (string.IsNullOrEmpty(rawMacros))
+            {
+                var serial = JsonSerializer.Serialize<List<MacroSet>>(myMacros);
+                WriteFile(fileName, serial, true);
+            }
+            else
+            {
+                myMacros = JsonSerializer.Deserialize<List<MacroSet>>(rawMacros) ?? new List<MacroSet>() { };
+            }
+            return myMacros;
+        }
+        public static void SaveMacrosToDisk(List<MacroSet> macros)
+        {
+            var macrosToSave = macros.Where(a => !string.IsNullOrEmpty(a.Name)).ToList();
+            string fileName = "macrosets.dat";
+            var serialA = JsonSerializer.Serialize<List<MacroSet>>(macrosToSave);
+            WriteFile(fileName, serialA, true);
+        }
+
         public static List<DaocCharacter> LoadCharactersFromDisk()
         {
             string fileName = "characters.dat";

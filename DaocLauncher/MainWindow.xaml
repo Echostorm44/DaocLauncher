@@ -28,7 +28,7 @@
                     <MenuItem Header="Manage Teams"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Macros">
-                    <MenuItem Header="TBD" Click="ClickedMacros"></MenuItem>
+                    <MenuItem Header="Manage Macros" Click="ClickedMacros"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Advanced">
                     <MenuItem Header="TBD"></MenuItem>

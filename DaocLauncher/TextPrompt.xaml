@@ -7,7 +7,7 @@
         mc:Ignorable="d" Height="200" Width="400" ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
         Topmost="True" WindowStyle="SingleBorderWindow" SizeToContent="WidthAndHeight">
     <StackPanel Margin="10">
-        <TextBlock Text="Enter your command:" />
+        <TextBlock Text="{Binding LabelText}" />
         <TextBox x:Name="ResponseTextBox" Width="350" KeyDown="ResponseTextBox_KeyDown" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="OK" Click="OKButton_Click" Width="60" Height="20" Margin="10" />

@@ -69,10 +69,10 @@ namespace DaocLauncher.Helpers
         }
 
         /// <summary>
-        /// Send keys to target window, this one is for putting keys into text box
+        /// Send keys to target window, this one is for putting keys into an already open chat box
         /// </summary>
         /// <param name="targetWindow">Result of FindWindow or similar</param>
-        /// <param name="key"></param>
+        /// <param name="keysToSend"></param>
         public void SendThoseChatKeysSucka(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
         {
             lock (sendLock)
@@ -90,7 +90,7 @@ namespace DaocLauncher.Helpers
         }
 
 
-        public void JustSendKey(IntPtr targetWindow, VirtualKeyCode key)
+        private void JustSendKey(IntPtr targetWindow, VirtualKeyCode key)
         {
             uint scanCode = MapVirtualKey((uint)key, 0);
             uint lParam = (0x00000001 | (scanCode << 16));
@@ -105,7 +105,7 @@ namespace DaocLauncher.Helpers
         /// Optimized version to prevent using more focus calls than needed to do a chat / command
         /// </summary>
         /// <param name="targetWindow">Result of FindWindow or similar</param>
-        /// <param name="key"></param>
+        /// <param name="keysToSend">eg /stick </param>
         public void SendChatCommand(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
         {
             lock (sendLock)

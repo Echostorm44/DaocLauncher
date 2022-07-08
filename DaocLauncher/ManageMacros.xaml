@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="DaocLauncher.ManageMacros"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DaocLauncher"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Existing Sets" FontSize="16" Margin="10,0"></TextBlock>
+                <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="14" 
+                          ItemsSource="{Binding MacroSetNames}" SelectionChanged="ddlExistingSets_SelectionChanged">
+                </ComboBox>
+                <Button Name="btnEditMacroSet" Content="Edit Set" Margin="10,0" Click="btnEditMacroSet_Click"></Button>
+                <Button Name="btnNewMacroSet" Content="New Set" Margin="10,0" Click="btnNewMacroSet_Click"></Button>
+                <Button Name="btnDeleteMacroSet" Content="Delete Selected Set" Margin="10,0" 
+                        Click="btnDeleteMacroSet_Click" Visibility="Collapsed"></Button>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

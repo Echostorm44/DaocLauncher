@@ -132,9 +132,6 @@ namespace DaocLauncher
 
         private void OnHotKeyHandler(HotKey hotKey)
         {
-            // Throw this into it's own thread
-
-
             if (!ActiveMacroSet.HotKeyCollection.TryGetValue(hotKey, out var targetActions))
             {
                 return;
@@ -170,121 +167,150 @@ namespace DaocLauncher
             if (macrosAreSleeping)
             {
                 return;
-            }            
-
-            lock (macroLock)// Prevent things from getting too crazy
+            }
+            Task.Run(() =>
             {
-                
-                IntPtr windowToReturnTo = GetActiveWindow();
-                var activeWindowName = "";
-                if (LoadedWindows.ContainsValue(windowToReturnTo))
+                lock (macroLock)// Prevent things from getting too crazy
                 {
-                    activeWindowName = LoadedWindows.First(a => a.Value == windowToReturnTo).Key;
-                }
-                //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_1, null, windowToReturnTo);
-                //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, windowToReturnTo);
-                foreach (var act in targetActions)
-                {
-                    switch (act.ActionType)
+                    IntPtr windowToReturnTo = GetActiveWindow();
+                    var activeWindowName = "";
+                    if (LoadedWindows.ContainsValue(windowToReturnTo))
                     {
-                        case HotkeyActionType.AssistActiveWindow:
-                            {
-                                // First find all the windows we need to send the command to based on the group                                
-                                if (string.IsNullOrEmpty(act.GroupName))// No group to use command specified, so we send to everyone except main
+                        activeWindowName = LoadedWindows.First(a => a.Value == windowToReturnTo).Key;
+                    }
+                    foreach (var act in targetActions)
+                    {
+                        switch (act.ActionType)
+                        {
+                            case HotkeyActionType.AssistActiveWindow:
+                                {
+                                    // First find all the windows we need to send the command to based on the group                                
+                                    if (string.IsNullOrEmpty(act.GroupName))// No group to use command specified, so we send to everyone except main
+                                    {
+                                        foreach (var win in LoadedWindows)
+                                        {
+                                            if (win.Key != activeWindowName)
+                                            {
+                                                keySender.SendChatCommand(win.Value, "/assist " + activeWindowName, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                    else if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                    {
+                                        foreach (var name in windowNamesToCheckFor)
+                                        {
+                                            if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                            {
+                                                keySender.SendChatCommand(winPtr, "/assist " + activeWindowName, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.TargetActiveWindow:
+                                {
+                                    if (string.IsNullOrEmpty(act.GroupName))// No group to use command specified, so we send to everyone except main
+                                    {
+                                        foreach (var win in LoadedWindows)
+                                        {
+                                            if (win.Key != activeWindowName)
+                                            {
+                                                keySender.SendChatCommand(win.Value, "/target " + activeWindowName, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                    else if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                    {
+                                        foreach (var name in windowNamesToCheckFor)
+                                        {
+                                            if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                            {
+                                                keySender.SendChatCommand(winPtr, "/target " + activeWindowName, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.Pause:
+                                {
+                                    Task.Delay(act.Count ?? 10).RunSynchronously();
+                                }
+                                break;
+                            case HotkeyActionType.GroupOnlyKeyCommand:
+                                {
+                                    if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                    {
+                                        foreach (var name in windowNamesToCheckFor)
+                                        {
+                                            if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                            {
+                                                keySender.SendThoseKeysSucka(winPtr, act.KeyToSend.Value, act.ModifierKeyToSend, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.SlashCommand:
+                                {
+                                    if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                    {
+                                        foreach (var name in windowNamesToCheckFor)
+                                        {
+                                            if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                            {
+                                                keySender.SendChatCommand(winPtr, act.Text, windowToReturnTo);
+                                            }
+                                        }
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.AllKeyCommand:
+                                {
+                                    foreach (var win in LoadedWindows)
+                                    {
+                                        keySender.SendThoseKeysSucka(win.Value, act.KeyToSend.Value, act.ModifierKeyToSend, windowToReturnTo);
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.EchoSay:
+                                {
+                                    var dialog = new TextPrompt();
+                                    if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
+                                    {
+                                        foreach (var win in LoadedWindows)
+                                        {
+                                            keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText, windowToReturnTo);
+                                        }
+                                    }
+                                }
+                                break;
+                            case HotkeyActionType.InviteGroup:
                                 {
                                     foreach (var win in LoadedWindows)
                                     {
                                         if (win.Key != activeWindowName)
                                         {
-                                            keySender.SendChatCommand(win.Value, "/assist " + activeWindowName, windowToReturnTo);
+                                            keySender.SendChatCommand(win.Value, "/invite " + activeWindowName, windowToReturnTo);
                                         }
                                     }
                                 }
-                                else if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
+                                break;
+                            case HotkeyActionType.SlashPrompt:
                                 {
-                                    foreach (var name in windowNamesToCheckFor)
+                                    var dialog = new TextPrompt();
+                                    if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
                                     {
-                                        if (LoadedWindows.TryGetValue(name, out var winPtr))
+                                        foreach (var win in LoadedWindows)
                                         {
-                                            keySender.SendChatCommand(winPtr, "/assist " + activeWindowName, windowToReturnTo);
-                                        }
-                                    }
-                                }                                
-                            }
-                            break;
-                        case HotkeyActionType.TargetActiveWindow:
-                            {
-                                if (string.IsNullOrEmpty(act.GroupName))// No group to use command specified, so we send to everyone except main
-                                {
-                                    foreach (var win in LoadedWindows)
-                                    {
-                                        if (win.Key != activeWindowName)
-                                        {
-                                            keySender.SendChatCommand(win.Value, "/target " + activeWindowName, windowToReturnTo);
+                                            keySender.SendChatCommand(win.Value, dialog.ResponseText, windowToReturnTo);
                                         }
                                     }
                                 }
-                                else if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
-                                {
-                                    foreach (var name in windowNamesToCheckFor)
-                                    {
-                                        if (LoadedWindows.TryGetValue(name, out var winPtr))
-                                        {
-                                            keySender.SendChatCommand(winPtr, "/target " + activeWindowName, windowToReturnTo);
-                                        }
-                                    }
-                                }
-                            }
-                            break;
-                        case HotkeyActionType.Pause:
-                            {
-                                // thread sleep or task.delay here
-                            }
-                            break;
-                        case HotkeyActionType.SlashCommand:
-                            {
-                                //var dialog = new TextPrompt();
-                                //if (dialog.ShowDialog() == true)
-                                //{
-                                //    keySender.SendChatCommand(WindowToFind, dialog.ResponseText, WindowToReturnTo);
-                                //}
-                            }
-                            break;
-                        case HotkeyActionType.GroupCommand:
-                            {
-
-                            }
-                            break;
-                        case HotkeyActionType.AllKeyCommand:
-                            {
-
-                            }
-                            break;
-                        case HotkeyActionType.EchoText:
-                            {
-
-                            }
-                            break;
-                        case HotkeyActionType.InviteGroup:
-                            {
-
-                            }
-                            break;
-                        case HotkeyActionType.SlashPrompt:
-                            {
-
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
-            }
-
-
-            //IntPtr windowToFind = FindWindow("DAoCMWC", "Buddyblocker");
-            //IntPtr windowToReturnTo = GetActiveWindow();            
-            //SendKeysTo keySender = new SendKeysTo();
-            //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_1, null, windowToReturnTo);
-            //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, windowToReturnTo);
+            });
         }
 
         private void TextBox_KeyDown(object sender, KeyEventArgs e)
@@ -293,5 +319,11 @@ namespace DaocLauncher
             var yoo = e.Key.ToString();
             var loo = sender;
         }
+
+        //IntPtr windowToFind = FindWindow("DAoCMWC", "Buddyblocker");
+        //IntPtr windowToReturnTo = GetActiveWindow();            
+        //SendKeysTo keySender = new SendKeysTo();
+        //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_1, null, windowToReturnTo);
+        //keySender.SendThoseKeysSucka(windowToFind, VirtualKeyCode.VK_3, VirtualKeyCode.SHIFT, windowToReturnTo);
     }
 }

@@ -27,10 +27,10 @@ namespace DaocLauncher.Helpers
         AssistActiveWindow, // (group
         TargetActiveWindow,
         Pause,         // pause script for x milliseconds
-        SlashCommand, // text
-        GroupCommand, // (group, key, modifier
+        GroupOnlyKeyCommand, // (group, key, modifier
+        SlashCommand,//face
         AllKeyCommand, // send a key to all (like sprint f
-        EchoText, // pop an input text box and echo the results to all windows with a /say
+        EchoSay, // pop an input text box and echo the results to all windows with a /say
         InviteGroup,  //Invites all windows to a group
         SlashPrompt, // Will echo the slash command given to all windows
         Disable, // Toggle, Disable and Enable everything so the user can type normally.  

@@ -16,10 +16,20 @@ namespace DaocLauncher
 {
     partial class TextPrompt : Window
     {
-
+        public string LabelText { get; set; }
         public TextPrompt()
         {
+            LabelText = "Enter your command:";
             InitializeComponent();
+            this.DataContext = this;
+            ResponseTextBox.Focus();
+        }
+
+        public TextPrompt(string labelText)
+        {
+            LabelText = labelText;
+            InitializeComponent();
+            this.DataContext = this;
             ResponseTextBox.Focus();
         }
 
