@@ -66,6 +66,51 @@ namespace DaocLauncher.Helpers
             ActionType = actionType;
         }
 
+        public override string ToString()
+        {
+            string result = "";
+            switch (ActionType)
+            {
+                case HotkeyActionType.AssistActiveWindow:
+                    result += $"{GroupName} Assist The Active Window";
+                    break;
+                case HotkeyActionType.TargetActiveWindow:
+                    result += $"{GroupName} Target The Active Window";
+                    break;
+                case HotkeyActionType.Pause:
+                    result += $"Pause Script For {Count} ms";
+                    break;
+                case HotkeyActionType.GroupOnlyKeyCommand:
+                    result += $"Send { (ModifierKeyToSend.HasValue ? ModifierKeyToSend.Value + " + " : "")}{ KeyToSend } To {GroupName}";
+                    break;
+                case HotkeyActionType.SlashCommand:
+                    result += $"Send {Text} Command To {GroupName}";
+                    break;
+                case HotkeyActionType.AllKeyCommand:
+                    result += $"Send {KeyToSend} To All Windows";
+                    break;
+                case HotkeyActionType.EchoSay:
+                    result += $"Prompt And Send Say";
+                    break;
+                case HotkeyActionType.InviteGroup:
+                    result += $"Invite Other Windows To Group";
+                    break;
+                case HotkeyActionType.SlashPrompt:
+                    result += $"Prompt And Send Slash Command";
+                    break;
+                case HotkeyActionType.Disable:
+                    result += "Disable Hotkeys";
+                    break;
+                case HotkeyActionType.Enable:
+                    result += "Enable Hotkeys";
+                    break;
+                case HotkeyActionType.ToggleAllHotkeys:
+                    result += "Toggle Hotkeys";
+                    break;
+            }            
+            return result;
+        }
+
         public HotKeyAction()
         {
             
@@ -87,11 +132,20 @@ namespace DaocLauncher.Helpers
         public KeyModifier KeyModifiers { get; private set; }
         public Action<HotKey>? HotKeyAction { get; private set; }
         public int Id { get; set; }
+        public string Description { get; set; }
 
-        public HotKey(Key k, KeyModifier keyModifiers)
+        public HotKey(Key k, KeyModifier keyModifiers, string description)
         {
             Key = k;
-            KeyModifiers = keyModifiers;            
+            KeyModifiers = keyModifiers;
+            Description = description;
+        }
+
+        public override string ToString()
+        {
+            var result = "";
+            result = Key.ToString() + (KeyModifiers == KeyModifier.None ? "" : " + " + KeyModifiers.ToString()) + " : " + Description;
+            return result;
         }
 
         public bool Register(Action<HotKey> action)

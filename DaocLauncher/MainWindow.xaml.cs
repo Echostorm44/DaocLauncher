@@ -79,9 +79,10 @@ namespace DaocLauncher
         HotKey hotKey;
         private void ClickedAbout(object sender, RoutedEventArgs e)
         {
-            hotKey = new HotKey(Key.F9, KeyModifier.None);
-            hotKey.Register(OnHotKeyHandler);
-
+            KeyPrompt keyPrompt = new KeyPrompt();
+            keyPrompt.ShowDialog();
+            //hotKey = new HotKey(Key.F9, KeyModifier.None, "test");
+            //hotKey.Register(OnHotKeyHandler);
         }
         [DllImport("user32.dll")]
         static extern IntPtr GetActiveWindow();

@@ -181,6 +181,45 @@ namespace DaocLauncher.Helpers
             WriteFile(fileName, serialA, false);
         }
 
+        public static List<string> LoadMacroGroupCategoriesListFromDisk()
+        {
+            string fileName = "macroCategories.ini";
+            var rawCategories = GetFileContents(fileName, false);
+            List<string> result = new List<string>();
+            if (string.IsNullOrEmpty(rawCategories))
+            {
+                result.Add("PBAOE");
+                result.Add("Melee");
+                result.Add("Caster");
+                result.Add("Healer");
+                result.Add("Buffer");
+                result.Add("Blocker");
+                var serialSL = JsonSerializer.Serialize<List<string>>(result);
+                WriteFile(fileName, serialSL, false);
+            }
+            else
+            {
+                result = JsonSerializer.Deserialize<List<string>>(rawCategories) ?? new List<string>();
+                if (result.Count == 0)
+                {
+                    result.Add("PBAOE");
+                    result.Add("Melee");
+                    result.Add("Caster");
+                    result.Add("Healer");
+                    result.Add("Buffer");
+                    result.Add("Blocker");
+                }
+            }
+            return result;
+        }
+
+        public static void SaveMacroGroupCategoriesToDisk(List<string> settings)
+        {
+            string fileName = "macroCategories.dat";
+            var serialA = JsonSerializer.Serialize<List<string>>(settings);
+            WriteFile(fileName, serialA, false);
+        }
+
         public static ServerList LoadServerListFromDisk()
         {
             string fileName = "serverList.ini";
