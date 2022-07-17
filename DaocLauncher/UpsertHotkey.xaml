@@ -1,0 +1,100 @@
+﻿<Window x:Class="DaocLauncher.UpsertHotkey"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DaocLauncher"
+        xmlns:helpers="clr-namespace:DaocLauncher.Helpers" d:DataContext="{d:DesignInstance Type=local:ManageMacros}"
+        mc:Ignorable="d"
+        Title="UpsertHotkey" Height="450" Width="850" WindowStartupLocation="CenterOwner">
+    <StackPanel Orientation="Vertical" Margin="10,0,10,10">
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <TextBlock Text="Key" FontSize="15" Margin="0,0,8,0"></TextBlock>
+            <ComboBox Name="ddlKey" FontSize="15" Width="80" Margin="0,0,8,0"></ComboBox>
+            <TextBlock Text="Key Modifier" FontSize="15" Margin="0,0,8,0"></TextBlock>
+            <ComboBox Name="ddlKeyMod" FontSize="15" Width="120" Margin="0,0,8,0"></ComboBox>
+            <TextBlock Text="Description" FontSize="15" Margin="0,0,8,0"></TextBlock>
+            <TextBlock x:Name="txtDescription" FontSize="15" Width="300" Margin="0,0,10,0"></TextBlock>
+            <Button Name="btnDone" Content="Done" FontSize="15" Click="btnDone_Click"></Button>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+            <ComboBox Name="ddlAddActionType" FontSize="15" Width="180" Margin="0,0,8,0" 
+                      ItemsSource="{Binding ActionTypeNames}"
+                      SelectionChanged="ddlAddActionType_SelectionChanged"></ComboBox>
+            <ComboBox Name="ddlAddActionGroupName" FontSize="15" Width="180" Margin="0,0,8,0" 
+                      ItemsSource="{Binding GroupCategories}"
+                      Visibility="Collapsed"></ComboBox>
+            <TextBox Name="txtAddActionCount" FontSize="15" Width="70" ToolTip="Count in milliseconds" Margin="0,0,8,0" Visibility="Collapsed"></TextBox>
+            <ComboBox Name="ddlAddActionKeyToSend" FontSize="15" Width="180" Margin="0,0,8,0" Visibility="Collapsed">
+                <ComboBoxItem Content="1"/>
+                <ComboBoxItem Content="2"/>
+                <ComboBoxItem Content="3"/>
+                <ComboBoxItem Content="4"/>
+                <ComboBoxItem Content="5"/>
+                <ComboBoxItem Content="6"/>
+                <ComboBoxItem Content="7"/>
+                <ComboBoxItem Content="8"/>
+                <ComboBoxItem Content="9"/>
+                <ComboBoxItem Content="0"/>
+                <ComboBoxItem Content="A"/>
+                <ComboBoxItem Content="B"/>
+                <ComboBoxItem Content="C"/>
+                <ComboBoxItem Content="D"/>
+                <ComboBoxItem Content="E"/>
+                <ComboBoxItem Content="F"/>
+                <ComboBoxItem Content="G"/>
+                <ComboBoxItem Content="H"/>
+                <ComboBoxItem Content="I"/>
+                <ComboBoxItem Content="J"/>
+                <ComboBoxItem Content="K"/>
+                <ComboBoxItem Content="L"/>
+                <ComboBoxItem Content="M"/>
+                <ComboBoxItem Content="N"/>
+                <ComboBoxItem Content="O"/>
+                <ComboBoxItem Content="P"/>
+                <ComboBoxItem Content="Q"/>
+                <ComboBoxItem Content="R"/>
+                <ComboBoxItem Content="S"/>
+                <ComboBoxItem Content="T"/>
+                <ComboBoxItem Content="U"/>
+                <ComboBoxItem Content="V"/>
+                <ComboBoxItem Content="W"/>
+                <ComboBoxItem Content="X"/>
+                <ComboBoxItem Content="Y"/>
+                <ComboBoxItem Content="Z"/>
+            </ComboBox>
+            <ComboBox Name="ddlAddActionModifierToSend" FontSize="15" Width="180" Margin="0,0,8,0" Visibility="Collapsed">
+                <ComboBoxItem Content="None"/>
+                <ComboBoxItem Content="Shift"/>
+                <ComboBoxItem Content="Alt"/>
+                <ComboBoxItem Content="Control"/>
+            </ComboBox>
+            <TextBox Name="txtAddActionText" FontSize="15" Width="70" ToolTip="" Margin="0,0,8,0" Visibility="Collapsed"></TextBox>
+            <Button Name="btnAddAction" Content="Add" FontSize="15" IsEnabled="False" Click="btnAddAction_Click"></Button>
+            
+        </StackPanel>
+        <ScrollViewer>
+            <helpers:HotKeyActionDragDropListBox x:Name="lstHotKeyActions" 
+                                                 ItemsSource="{Binding Path=AllActions}" MinHeight="150">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Margin="0,0,10,0" Background="WhiteSmoke" BorderBrush="Gray" BorderThickness="1"
+                                    Command="{Binding ElementName=lstHotKeyActions, Path=DataContext.RemoveActionCommand}" CommandParameter="{Binding .}">
+                                <Button.Content>
+                                    <Viewbox Height="20" Width="20">
+                                        <Path Fill="Gray" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                Data="M160 400C160 408.8 152.8 416 144 416C135.2 416 128 408.8 128 400V192C128 183.2 135.2 176 144 176C152.8 176 160 183.2 160 192V400zM240 400C240 408.8 232.8 416 224 416C215.2 416 208 408.8 208 400V192C208 183.2 215.2 176 224 176C232.8 176 240 183.2 240 192V400zM320 400C320 408.8 312.8 416 304 416C295.2 416 288 408.8 288 400V192C288 183.2 295.2 176 304 176C312.8 176 320 183.2 320 192V400zM317.5 24.94L354.2 80H424C437.3 80 448 90.75 448 104C448 117.3 437.3 128 424 128H416V432C416 476.2 380.2 512 336 512H112C67.82 512 32 476.2 32 432V128H24C10.75 128 0 117.3 0 104C0 90.75 10.75 80 24 80H93.82L130.5 24.94C140.9 9.357 158.4 0 177.1 0H270.9C289.6 0 307.1 9.358 317.5 24.94H317.5zM151.5 80H296.5L277.5 51.56C276 49.34 273.5 48 270.9 48H177.1C174.5 48 171.1 49.34 170.5 51.56L151.5 80zM80 432C80 449.7 94.33 464 112 464H336C353.7 464 368 449.7 368 432V128H80V432z">
+                                        </Path>
+                                    </Viewbox>
+                                </Button.Content>
+                            </Button>
+                            <TextBlock Text="{Binding }" FontSize="16" VerticalAlignment="Center"></TextBlock>
+                        </StackPanel>                        
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </helpers:HotKeyActionDragDropListBox>
+        </ScrollViewer>
+    </StackPanel>
+
+</Window>

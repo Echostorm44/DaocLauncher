@@ -53,6 +53,7 @@ namespace DaocLauncher
         {
             var name = "";
             var prompt = new TextPrompt("Enter a name for the new macro set:");
+            prompt.Owner = Application.Current.MainWindow; 
             if (prompt.ShowDialog() == true)
             {
                 name = prompt.ResponseText;
@@ -75,24 +76,24 @@ namespace DaocLauncher
             // set some defaults to deal with chat box being active to pause macros
 
             set.HotKeyCollection.Add(new HotKey(Key.Enter, KeyModifier.None, "Toggle hotkeys on entering and leaving chat"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.ToggleAllHotkeys) });
+                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.ToggleAllHotkeysOnOff) });
             set.HotKeyCollection.Add(new HotKey(Key.Escape, KeyModifier.None, "Enable hotkeys in case leaving chat"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.Enable) });
+                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.EnableAllHotkeys) });
             
             set.HotKeyCollection.Add(new HotKey(Key.D2, KeyModifier.None, "PBAOE Nuke"),
                 new List<HotKeyAction>() 
                 { 
-                    new HotKeyAction("PBAOE", null, VirtualKeyCode.VK_2, null, null, HotkeyActionType.GroupOnlyKeyCommand),
+                    new HotKeyAction("PBAOE", null, VirtualKeyCode.VK_2, null, null, HotkeyActionType.GroupKeyCommand),
                     new HotKeyAction("Melee", null, null, null, null, HotkeyActionType.AssistActiveWindow),
                     new HotKeyAction("Blocker", null, null, null, null, HotkeyActionType.AssistActiveWindow),
-                    new HotKeyAction(null, 150, null, null, null, HotkeyActionType.Pause),
+                    new HotKeyAction(null, 150, null, null, null, HotkeyActionType.PauseScript),
                     new HotKeyAction("Melee", null, null, null, "/stick", HotkeyActionType.SlashCommand),
-                    new HotKeyAction("Melee", null, VirtualKeyCode.VK_4, VirtualKeyCode.ALT, null, HotkeyActionType.GroupOnlyKeyCommand),
+                    new HotKeyAction("Melee", null, VirtualKeyCode.VK_4, VirtualKeyCode.ALT, null, HotkeyActionType.GroupKeyCommand),
                     new HotKeyAction("Blocker", null, null, null, "/face", HotkeyActionType.SlashCommand),
                 });
 
             set.HotKeyCollection.Add(new HotKey(Key.R, KeyModifier.None, "Disable hotkeys for chat reply"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.Disable) });
+                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys) });
 
             //KeyPrompt keyPrompt = new KeyPrompt("Press your / key", '/');  // Add one for reply as well since key isn't hard coded
             //if (keyPrompt.ShowDialog() == true)
@@ -110,16 +111,38 @@ namespace DaocLauncher
             //GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
             CurrentSet = set;
             MacroSetNames.Add(name);
+            ddlExistingSets.SelectedValue = name;
         }
 
         private void btnDeleteMacroSet_Click(object sender, RoutedEventArgs e)
         {
-
+            if (MessageBox.Show("Are you sure you want to delete the macro set?", "Really Delete Set?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                if (ddlExistingSets.SelectedValue == null)
+                {
+                    return;
+                }
+                CurrentSet = null;
+                string setName = ddlExistingSets.SelectedValue.ToString();
+                MacroSets.Remove(MacroSets.Single(a => a.Name == setName));
+                MacroSetNames.Remove(setName);
+                ddlExistingSets.SelectedValue = null;
+                //GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());                
+            }
         }
 
         private void ddlExistingSets_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (ddlExistingSets.SelectedValue != null)
+            {
+                btnDeleteMacroSet.Visibility = Visibility.Visible;
+                CurrentSet = MacroSets.Single(a => a.Name == ddlExistingSets.SelectedValue.ToString());
+            }
+            else
+            {
+                btnDeleteMacroSet.Visibility = Visibility.Hidden;
+                CurrentSet = null;
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
@@ -128,9 +151,11 @@ namespace DaocLauncher
         }
 
         private void lstHotkeys_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
+        {            
             dynamic roo = lstHotkeys.SelectedItem;
-            var soo = roo.Value;
+            UpsertHotkey hotWindow = new UpsertHotkey(roo.Key, roo.Value, GroupCategories);
+            hotWindow.Owner = Application.Current.MainWindow;
+            hotWindow.ShowDialog();
         }
     }
 }

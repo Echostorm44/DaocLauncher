@@ -46,6 +46,7 @@ namespace DaocLauncher
         public SendKeysTo keySender { get; private set; }
         public Dashboard()
         {
+            // Check for previously loaded chars.  In case program shutdown
             LoadedWindows = new Dictionary<string, IntPtr>();
             // TODO Load MacroSets
             AllCharacters = GeneralHelpers.LoadCharactersFromDisk() ?? new List<DaocCharacter>();
@@ -138,23 +139,23 @@ namespace DaocLauncher
             }
             // We need to check and see if the key is Enter, /, ', r, or escape to deal with the chat window being open
             // escape always closes it, /, ' and r (reply) only open it and enter toggles it
-            if (targetActions.Any(a => a.ActionType == HotkeyActionType.Disable || a.ActionType == HotkeyActionType.Enable || a.ActionType == HotkeyActionType.ToggleAllHotkeys))
+            if (targetActions.Any(a => a.ActionType == HotkeyActionType.DisableAllHotkeys || a.ActionType == HotkeyActionType.EnableAllHotkeys || a.ActionType == HotkeyActionType.ToggleAllHotkeysOnOff))
             {
                 foreach (var act in targetActions)
                 {
                     switch (act.ActionType)
                     {                        
-                        case HotkeyActionType.Disable:
+                        case HotkeyActionType.DisableAllHotkeys:
                             {
                                 macrosAreSleeping = true;
                             }
                             break;
-                        case HotkeyActionType.Enable:
+                        case HotkeyActionType.EnableAllHotkeys:
                             {
                                 macrosAreSleeping = false;
                             }
                             break;
-                        case HotkeyActionType.ToggleAllHotkeys:
+                        case HotkeyActionType.ToggleAllHotkeysOnOff:
                             {
                                 macrosAreSleeping = !macrosAreSleeping;
                             }
@@ -231,12 +232,12 @@ namespace DaocLauncher
                                     }
                                 }
                                 break;
-                            case HotkeyActionType.Pause:
+                            case HotkeyActionType.PauseScript:
                                 {
                                     Task.Delay(act.Count ?? 10).RunSynchronously();
                                 }
                                 break;
-                            case HotkeyActionType.GroupOnlyKeyCommand:
+                            case HotkeyActionType.GroupKeyCommand:
                                 {
                                     if (ActiveMacroSet.CategoryGroups.TryGetValue(act.GroupName, out var windowNamesToCheckFor))
                                     {
@@ -284,7 +285,7 @@ namespace DaocLauncher
                                     }
                                 }
                                 break;
-                            case HotkeyActionType.InviteGroup:
+                            case HotkeyActionType.InviteAllWindowsToGroup:
                                 {
                                     foreach (var win in LoadedWindows)
                                     {

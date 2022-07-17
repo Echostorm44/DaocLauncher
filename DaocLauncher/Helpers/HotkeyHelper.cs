@@ -26,19 +26,19 @@ namespace DaocLauncher.Helpers
     {
         AssistActiveWindow, // (group
         TargetActiveWindow,
-        Pause,         // pause script for x milliseconds
-        GroupOnlyKeyCommand, // (group, key, modifier
+        PauseScript,         // pause script for x milliseconds
+        GroupKeyCommand, // (group, key, modifier
         SlashCommand,//face
         AllKeyCommand, // send a key to all (like sprint f
         EchoSay, // pop an input text box and echo the results to all windows with a /say
-        InviteGroup,  //Invites all windows to a group
+        InviteAllWindowsToGroup,  //Invites all windows to a group
         SlashPrompt, // Will echo the slash command given to all windows
-        Disable, // Toggle, Disable and Enable everything so the user can type normally.  
-        Enable,  // Main use should be to toggle on Enter and /
-        ToggleAllHotkeys,
+        DisableAllHotkeys, // Toggle, Disable and Enable everything so the user can type normally.  
+        EnableAllHotkeys,  // Main use should be to toggle on Enter and /
+        ToggleAllHotkeysOnOff,
     }
 
-    public class HotKeyAction
+    public class HotKeyAction : IDragAndDropListBoxItem
     {
         public string? GroupName { get; set; } // Casters, healers
         public int? Count { get; set; } // for use with things like pause
@@ -46,6 +46,7 @@ namespace DaocLauncher.Helpers
         public VirtualKeyCode? ModifierKeyToSend { get; set; } // shift alt
         public string? Text { get; set; } // For things like slash command
         public HotkeyActionType ActionType { get; set; }
+        public int SortOrderID { get; set; }
 
         /// <summary>
         /// HotKeyAction
@@ -77,10 +78,10 @@ namespace DaocLauncher.Helpers
                 case HotkeyActionType.TargetActiveWindow:
                     result += $"{GroupName} Target The Active Window";
                     break;
-                case HotkeyActionType.Pause:
+                case HotkeyActionType.PauseScript:
                     result += $"Pause Script For {Count} ms";
                     break;
-                case HotkeyActionType.GroupOnlyKeyCommand:
+                case HotkeyActionType.GroupKeyCommand:
                     result += $"Send { (ModifierKeyToSend.HasValue ? ModifierKeyToSend.Value + " + " : "")}{ KeyToSend } To {GroupName}";
                     break;
                 case HotkeyActionType.SlashCommand:
@@ -92,19 +93,19 @@ namespace DaocLauncher.Helpers
                 case HotkeyActionType.EchoSay:
                     result += $"Prompt And Send Say";
                     break;
-                case HotkeyActionType.InviteGroup:
+                case HotkeyActionType.InviteAllWindowsToGroup:
                     result += $"Invite Other Windows To Group";
                     break;
                 case HotkeyActionType.SlashPrompt:
                     result += $"Prompt And Send Slash Command";
                     break;
-                case HotkeyActionType.Disable:
+                case HotkeyActionType.DisableAllHotkeys:
                     result += "Disable Hotkeys";
                     break;
-                case HotkeyActionType.Enable:
+                case HotkeyActionType.EnableAllHotkeys:
                     result += "Enable Hotkeys";
                     break;
-                case HotkeyActionType.ToggleAllHotkeys:
+                case HotkeyActionType.ToggleAllHotkeysOnOff:
                     result += "Toggle Hotkeys";
                     break;
             }            
