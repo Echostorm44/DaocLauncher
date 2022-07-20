@@ -70,18 +70,18 @@ namespace DaocLauncher
             {
                 return;
             }
-            MacroSet set = new MacroSet(name, new Dictionary<string, List<string>>(),
-                        new Dictionary<HotKey, List<HotKeyAction>>());
-            set.CategoryGroups.Add(GroupCategories.First(), new List<string>() { "CharacterName" });
+            MacroSet set = new MacroSet(name, new Dictionary<string, ObservableCollection<string>>(),
+                        new Dictionary<HotKey, ObservableCollection<HotKeyAction>>());
+            set.CategoryGroups.Add(GroupCategories.First(), new ObservableCollection<string>() { "CharacterName" });
             // set some defaults to deal with chat box being active to pause macros
 
             set.HotKeyCollection.Add(new HotKey(Key.Enter, KeyModifier.None, "Toggle hotkeys on entering and leaving chat"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.ToggleAllHotkeysOnOff) });
+                new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.ToggleAllHotkeysOnOff) });
             set.HotKeyCollection.Add(new HotKey(Key.Escape, KeyModifier.None, "Enable hotkeys in case leaving chat"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.EnableAllHotkeys) });
+                new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.EnableAllHotkeys) });
             
             set.HotKeyCollection.Add(new HotKey(Key.D2, KeyModifier.None, "PBAOE Nuke"),
-                new List<HotKeyAction>() 
+                new ObservableCollection<HotKeyAction>() 
                 { 
                     new HotKeyAction("PBAOE", null, VirtualKeyCode.VK_2, null, null, HotkeyActionType.GroupKeyCommand),
                     new HotKeyAction("Melee", null, null, null, null, HotkeyActionType.AssistActiveWindow),
@@ -93,7 +93,7 @@ namespace DaocLauncher
                 });
 
             set.HotKeyCollection.Add(new HotKey(Key.R, KeyModifier.None, "Disable hotkeys for chat reply"),
-                new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys) });
+                new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys) });
 
             //KeyPrompt keyPrompt = new KeyPrompt("Press your / key", '/');  // Add one for reply as well since key isn't hard coded
             //if (keyPrompt.ShowDialog() == true)
@@ -152,10 +152,13 @@ namespace DaocLauncher
 
         private void lstHotkeys_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {            
-            dynamic roo = lstHotkeys.SelectedItem;
+            dynamic roo = lstHotkeys.SelectedItem;            
             UpsertHotkey hotWindow = new UpsertHotkey(roo.Key, roo.Value, GroupCategories);
             hotWindow.Owner = Application.Current.MainWindow;
             hotWindow.ShowDialog();
+            // Do a quick compare of the all action list && save if needed
+            currentSet.HotKeyCollection[roo.Key] = hotWindow.AllActions;
+            MacroSets.Single(a => a.Name == currentSet.Name).HotKeyCollection[roo.Key] = hotWindow.AllActions;
         }
     }
 }

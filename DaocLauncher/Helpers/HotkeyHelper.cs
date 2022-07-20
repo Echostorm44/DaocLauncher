@@ -17,9 +17,7 @@ namespace DaocLauncher.Helpers
         None = 0x0000,
         Alt = 0x0001,
         Ctrl = 0x0002,
-        NoRepeat = 0x4000,
         Shift = 0x0004,
-        Win = 0x0008
     }
 
     public enum HotkeyActionType
@@ -82,13 +80,13 @@ namespace DaocLauncher.Helpers
                     result += $"Pause Script For {Count} ms";
                     break;
                 case HotkeyActionType.GroupKeyCommand:
-                    result += $"Send { (ModifierKeyToSend.HasValue ? ModifierKeyToSend.Value + " + " : "")}{ KeyToSend } To {GroupName}";
+                    result += $"Send { (ModifierKeyToSend.HasValue ? ModifierKeyToSend.Value + " + " : "") +  KeyToSend?.ToString()?.Replace("VK_","") } To {GroupName}";
                     break;
                 case HotkeyActionType.SlashCommand:
                     result += $"Send {Text} Command To {GroupName}";
                     break;
                 case HotkeyActionType.AllKeyCommand:
-                    result += $"Send {KeyToSend} To All Windows";
+                    result += $"Send {(ModifierKeyToSend.HasValue ? ModifierKeyToSend.Value + " + " : "") + KeyToSend?.ToString()?.Replace("VK_", "") } To All Windows";
                     break;
                 case HotkeyActionType.EchoSay:
                     result += $"Prompt And Send Say";
@@ -129,9 +127,9 @@ namespace DaocLauncher.Helpers
         public const int WmHotKey = 0x0312;
 
         private bool AmIDisposed = false;
-        public Key Key { get; private set; }
-        public KeyModifier KeyModifiers { get; private set; }
-        public Action<HotKey>? HotKeyAction { get; private set; }
+        public Key Key { get; set; }
+        public KeyModifier KeyModifiers { get; set; }
+        public Action<HotKey>? HotKeyAction { get; set; }
         public int Id { get; set; }
         public string Description { get; set; }
 

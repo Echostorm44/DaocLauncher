@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace DaocLauncher.Helpers
 {
     public enum VirtualKeyCode //: UInt16
-    {
+    {   
         /// <summary>
         /// Left mouse button
         /// </summary>
@@ -231,6 +232,7 @@ namespace DaocLauncher.Helpers
         /// <summary>
         /// 0 key
         /// </summary>
+        
         VK_0 = 0x30,
 
         /// <summary>
