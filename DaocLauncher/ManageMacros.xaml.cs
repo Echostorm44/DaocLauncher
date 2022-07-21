@@ -156,9 +156,18 @@ namespace DaocLauncher
             UpsertHotkey hotWindow = new UpsertHotkey(roo.Key, roo.Value, GroupCategories);
             hotWindow.Owner = Application.Current.MainWindow;
             hotWindow.ShowDialog();
-            // Do a quick compare of the all action list && save if needed
-            currentSet.HotKeyCollection[roo.Key] = hotWindow.AllActions;
-            MacroSets.Single(a => a.Name == currentSet.Name).HotKeyCollection[roo.Key] = hotWindow.AllActions;
+
+            if (CurrentSet.HotKeyCollection.ContainsKey(hotWindow.TheHotKey))
+            {
+                CurrentSet.HotKeyCollection[hotWindow.TheHotKey] = hotWindow.AllActions;
+                MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection[hotWindow.TheHotKey] = hotWindow.AllActions;
+            }
+            else
+            {
+                CurrentSet.HotKeyCollection.Add(hotWindow.TheHotKey, hotWindow.AllActions);
+                MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Add(hotWindow.TheHotKey, hotWindow.AllActions);
+            }
+            GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
         }
     }
 }

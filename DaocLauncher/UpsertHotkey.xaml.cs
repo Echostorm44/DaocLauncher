@@ -21,7 +21,7 @@ namespace DaocLauncher
     /// </summary>
     public partial class UpsertHotkey : Window
     {
-        public HotKey? TheHotKey { get; set; }
+        public HotKey TheHotKey { get; set; }
         public ObservableCollection<HotKeyAction> AllActions { get; set; }
         public ICommand RemoveActionCommand { get; private set; }
         public List<string> ActionTypeNames { get; set; }
@@ -309,30 +309,16 @@ namespace DaocLauncher
         {
             if (string.IsNullOrEmpty(txtHotKey.Text))
             {
-                if (TheHotKey != null)
-                {
-                    txtHotKey.Text = TheHotKey.Key.ToString();
-                }
+                txtHotKey.Text = TheHotKey.Key.ToString();
                 return;
             }
-            if (TheHotKey == null)
-            {
-                TheHotKey = new HotKey(e.Key, KeyModifier.None, txtDescription.Text);
-            }
-            else
-            {
-                TheHotKey.Key = e.Key;            
-            }
+            TheHotKey.Key = e.Key;
             txtHotKey.Text = TheHotKey.Key.ToString();
             ddlKeyMod.Focus();
         }
 
         private void ddlKeyMod_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TheHotKey == null)
-            {
-                return;
-            }
             switch (ddlKeyMod.SelectedValue)
             {
                 case "Alt":
@@ -360,10 +346,6 @@ namespace DaocLauncher
 
         private void txtDescription_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (TheHotKey == null)
-            {
-                return;
-            }
             TheHotKey.Description = txtDescription.Text;
         }
     }

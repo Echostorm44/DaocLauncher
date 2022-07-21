@@ -70,10 +70,11 @@ namespace DaocLauncher.Helpers
             var macrosToSave = macros.Where(a => !string.IsNullOrEmpty(a.Name)).ToList();
             foreach (var set in macrosToSave)
             {
-                foreach (var hotKey in set.HotKeyCollection)
+                foreach (var hotKey in set.HotKeyCollection.Keys)
                 {
-                    //hotKey.Value = hotKey.Value.OrderBy(a => a.SortOrderID).ToList();
-                    //hotKey.Value.Sort((p1, p2) =>  string.Compare(p1.Name, p2.Name, true));
+                    set.HotKeyCollection[hotKey].Clear();
+                    set.HotKeyCollection[hotKey].OrderBy(a => a.SortOrderID).ToList().ForEach(a => 
+                        set.HotKeyCollection[hotKey].Add(a));
                 }
             }
             string fileName = "macrosets.dat";
