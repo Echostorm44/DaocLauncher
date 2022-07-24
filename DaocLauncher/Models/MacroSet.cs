@@ -41,23 +41,9 @@ namespace DaocLauncher.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CategoryGroups)));
             }
         }
-        Dictionary<HotKey, ObservableCollection<HotKeyAction>> hotKeyCollection;
-        public Dictionary<HotKey, ObservableCollection<HotKeyAction>> HotKeyCollection
-        {
-            get => hotKeyCollection;
-            set
-            {
-                if (hotKeyCollection == value)
-                {
-                    return;
-                }
-
-                hotKeyCollection = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HotKeyCollection)));
-            }
-        } // 2: assist melee, slash command face, hotkey 2, pause 2000, hotkey 3
-
-        public MacroSet(string name, Dictionary<string, ObservableCollection<string>> categoryGroups, Dictionary<HotKey, ObservableCollection<HotKeyAction>> hotKeyCollection)
+        public ObservableCollection<HotKey> HotKeyCollection { get; set; }
+        
+        public MacroSet(string name, Dictionary<string, ObservableCollection<string>> categoryGroups, ObservableCollection<HotKey> hotKeyCollection)
         {
             Name = name;
             CategoryGroups = categoryGroups;

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DaocLauncher"
         xmlns:helpers="clr-namespace:DaocLauncher.Helpers" d:DataContext="{d:DesignInstance Type=local:ManageMacros}"
         mc:Ignorable="d"
-        Title="UpsertHotkey" Height="450" Width="850" WindowStartupLocation="CenterOwner">
+        Title="UpsertHotkey" Height="450" Width="870" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <helpers:CleanVkEnumToString x:Key="VkEnumConverter" />
     </Window.Resources>
@@ -30,7 +30,7 @@
             <ComboBox Name="ddlAddActionGroupName" FontSize="15" Width="180" Margin="0,0,8,0" 
                       ItemsSource="{Binding GroupCategories}"
                       Visibility="Collapsed"></ComboBox>
-            <TextBox Name="txtAddActionCount" FontSize="15" Width="70" ToolTip="Count in milliseconds" Margin="0,0,8,0" Visibility="Collapsed"></TextBox>
+            <TextBox Name="txtAddActionCount" FontSize="15" Width="70" ToolTip="Count in milliseconds" Margin="0,0,8,0" TextChanged="txtAddActionCount_TextChanged" Visibility="Collapsed"></TextBox>
             <ComboBox Name="ddlAddActionKeyToSend" FontSize="15" Width="180" Margin="0,0,8,0" Visibility="Collapsed" ItemsSource="{Binding PossibleVirtualKeyCodes}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
@@ -49,7 +49,7 @@
             
         </StackPanel>
         <ScrollViewer>
-            <helpers:HotKeyActionDragDropListBox x:Name="lstHotKeyActions" ItemsSource="{Binding Path=AllActions}" Height="250" ScrollViewer.VerticalScrollBarVisibility="Auto">
+            <helpers:HotKeyActionDragDropListBox x:Name="lstHotKeyActions" ItemsSource="{Binding Path=TheHotKey.TriggeredActions}" Height="250" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

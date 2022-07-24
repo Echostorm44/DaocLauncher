@@ -1,6 +1,7 @@
 ﻿using DaocLauncher.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -53,7 +54,7 @@ namespace DaocLauncher.Helpers
             string fileName = "macrosets.dat";
             var myMacros = new List<MacroSet>();
 
-            var rawMacros = GetFileContents(fileName, true);
+            var rawMacros = GetFileContents(fileName, false);
             if (string.IsNullOrEmpty(rawMacros))
             {
                 var serial = JsonSerializer.Serialize<List<MacroSet>>(myMacros);
@@ -62,6 +63,7 @@ namespace DaocLauncher.Helpers
             else
             {
                 myMacros = JsonSerializer.Deserialize<List<MacroSet>>(rawMacros) ?? new List<MacroSet>() { };
+                //myMacros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MacroSet>>(rawMacros) ?? new List<MacroSet>() { };
             }
             return myMacros;
         }
@@ -70,16 +72,19 @@ namespace DaocLauncher.Helpers
             var macrosToSave = macros.Where(a => !string.IsNullOrEmpty(a.Name)).ToList();
             foreach (var set in macrosToSave)
             {
-                foreach (var hotKey in set.HotKeyCollection.Keys)
+                foreach (var hotKey in set.HotKeyCollection)
                 {
-                    set.HotKeyCollection[hotKey].Clear();
-                    set.HotKeyCollection[hotKey].OrderBy(a => a.SortOrderID).ToList().ForEach(a => 
-                        set.HotKeyCollection[hotKey].Add(a));
+
+                    var temp = hotKey.TriggeredActions.Select(a => (HotKeyAction)a.Clone()).ToList();// If you don't do a clone here you'll just kill them by ref when clearing on next line
+                    hotKey.TriggeredActions.Clear();
+                    temp.OrderBy(a => a.SortOrderID).ToList().ForEach(a => 
+                        hotKey.TriggeredActions.Add(a));
                 }
             }
             string fileName = "macrosets.dat";
             var serialA = JsonSerializer.Serialize<List<MacroSet>>(macrosToSave);
-            WriteFile(fileName, serialA, true);
+            //var serialA = Newtonsoft.Json.JsonConvert.SerializeObject(macrosToSave);
+            WriteFile(fileName, serialA, false);
         }
 
         public static List<DaocCharacter> LoadCharactersFromDisk()

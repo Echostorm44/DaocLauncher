@@ -133,15 +133,11 @@ namespace DaocLauncher
 
         private void OnHotKeyHandler(HotKey hotKey)
         {
-            if (!ActiveMacroSet.HotKeyCollection.TryGetValue(hotKey, out var targetActions))
-            {
-                return;
-            }
             // We need to check and see if the key is Enter, /, ', r, or escape to deal with the chat window being open
             // escape always closes it, /, ' and r (reply) only open it and enter toggles it
-            if (targetActions.Any(a => a.ActionType == HotkeyActionType.DisableAllHotkeys || a.ActionType == HotkeyActionType.EnableAllHotkeys || a.ActionType == HotkeyActionType.ToggleAllHotkeysOnOff))
+            if (hotKey.TriggeredActions.Any(a => a.ActionType == HotkeyActionType.DisableAllHotkeys || a.ActionType == HotkeyActionType.EnableAllHotkeys || a.ActionType == HotkeyActionType.ToggleAllHotkeysOnOff))
             {
-                foreach (var act in targetActions)
+                foreach (var act in hotKey.TriggeredActions)
                 {
                     switch (act.ActionType)
                     {                        
@@ -179,7 +175,7 @@ namespace DaocLauncher
                     {
                         activeWindowName = LoadedWindows.First(a => a.Value == windowToReturnTo).Key;
                     }
-                    foreach (var act in targetActions)
+                    foreach (var act in hotKey.TriggeredActions)
                     {
                         switch (act.ActionType)
                         {

@@ -25,8 +25,8 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock FontSize="16" Text="{Binding Key}"></TextBlock>
-                                <ItemsControl ItemsSource="{Binding Value}">
+                                <TextBlock FontSize="16" Text="{Binding }"></TextBlock>
+                                <ItemsControl ItemsSource="{Binding TriggeredActions}">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>                                            
                                             <StackPanel Orientation="Vertical"/>

@@ -22,19 +22,16 @@ namespace DaocLauncher
     public partial class UpsertHotkey : Window
     {
         public HotKey TheHotKey { get; set; }
-        public ObservableCollection<HotKeyAction> AllActions { get; set; }
         public ICommand RemoveActionCommand { get; private set; }
         public List<string> ActionTypeNames { get; set; }
         public List<string> GroupCategories { get; set; }
         public List<VirtualKeyCode> PossibleVirtualKeyCodes { get; set; }
         public List<string> HotKeyMods { get; set; }
         
-        public UpsertHotkey(HotKey key, ObservableCollection<HotKeyAction> actions, List<string> groupCategories)
+        public UpsertHotkey(HotKey key, List<string> groupCategories)
         {
             GroupCategories = groupCategories;
             ActionTypeNames = Enum.GetNames(typeof(HotkeyActionType)).ToList();
-            AllActions = new ObservableCollection<HotKeyAction>();
-            AllActions = actions;
             TheHotKey = key;
             RemoveActionCommand = new RelayCommand(a => RemoveAction(a));
             HotKeyMods = new List<string>() { "None", "Alt", "Shift", "Control" };
@@ -133,69 +130,138 @@ namespace DaocLauncher
                         }
 
                         var act = new HotKeyAction(null, null, (VirtualKeyCode)ddlAddActionKeyToSend.SelectedValue,
-                            modKey, null, HotkeyActionType.AllKeyCommand);
-                        AllActions.Add(act);
+                            modKey, null, HotkeyActionType.AllKeyCommand, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.AssistActiveWindow:
                     {
-                        ddlAddActionGroupName.Visibility = Visibility.Visible;
+                        if (ddlAddActionGroupName.SelectedValue == null)
+                        {
+                            MessageBox.Show("Please make all selections before adding");
+                            return;
+                        }
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
-                            null, null, HotkeyActionType.AssistActiveWindow);
+                            null, null, HotkeyActionType.AssistActiveWindow, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.DisableAllHotkeys:
                     {
-
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.DisableAllHotkeys, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.EchoSay:
-                    {
-                        txtAddActionText.Visibility = Visibility.Visible;
+                    {       
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.EchoSay, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.EnableAllHotkeys:
                     {
-
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.EnableAllHotkeys, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.GroupKeyCommand:
                     {
-                        ddlAddActionGroupName.Visibility = Visibility.Visible;
-                        ddlAddActionKeyToSend.Visibility = Visibility.Visible;
-                        ddlAddActionModifierToSend.Visibility = Visibility.Visible;
+                        if (ddlAddActionKeyToSend.SelectedValue == null || 
+                            ddlAddActionModifierToSend.SelectedValue == null ||
+                            ddlAddActionGroupName.SelectedValue == null)
+                        {
+                            MessageBox.Show("Please make all selections before adding");
+                            return;
+                        }
+                        VirtualKeyCode? modKey = null;
+                        switch (((ComboBoxItem)ddlAddActionModifierToSend.SelectedValue).Content)
+                        {
+                            case "Shift":
+                                {
+                                    modKey = VirtualKeyCode.SHIFT;
+                                }
+                                break;
+                            case "Alt":
+                                {
+                                    modKey = VirtualKeyCode.ALT;
+                                }
+                                break;
+                            case "Control":
+                                {
+                                    modKey = VirtualKeyCode.CONTROL;
+                                }
+                                break;
+                            default:
+                                {
+                                    modKey = null;
+                                }
+                                break;
+                        }
+
+                        var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, 
+                            (VirtualKeyCode)ddlAddActionKeyToSend.SelectedValue,
+                            modKey, null, HotkeyActionType.GroupKeyCommand, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.InviteAllWindowsToGroup:
                     {
-
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.InviteAllWindowsToGroup, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.PauseScript:
                     {
-                        txtAddActionCount.Visibility = Visibility.Visible;
+                        if (!int.TryParse(txtAddActionCount.Text, out var count))
+                        {
+                            MessageBox.Show("Please make all selections before adding");
+                            return;
+                        }
+                        var act = new HotKeyAction(null, count, null,
+                            null, null, HotkeyActionType.PauseScript, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.SlashCommand:
                     {
-                        ddlAddActionGroupName.Visibility = Visibility.Visible;
-                        txtAddActionText.Visibility = Visibility.Visible;
-                        ddlAddActionGroupName.Visibility = Visibility.Visible;
+                        if (ddlAddActionGroupName.SelectedValue == null || string.IsNullOrEmpty(txtAddActionText.Text))
+                        {
+                            MessageBox.Show("Please make all selections before adding");
+                            return;
+                        }
+                        var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
+                            null, txtAddActionText.Text, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.SlashPrompt:
                     {
-
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.TargetActiveWindow:
                     {
-                        ddlAddActionGroupName.Visibility = Visibility.Visible;
+                        if (ddlAddActionGroupName.SelectedValue == null)
+                        {
+                            MessageBox.Show("Please make all selections before adding");
+                            return;
+                        }
+                        var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
+                            null, null, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.ToggleAllHotkeysOnOff:
                     {
-
+                        var act = new HotKeyAction(null, null, null,
+                            null, null, HotkeyActionType.ToggleAllHotkeysOnOff, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                        TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
             }
@@ -210,7 +276,7 @@ namespace DaocLauncher
                 return;
             }
             var targetAction = (HotKeyAction)choice;
-            AllActions.Remove(targetAction);
+            TheHotKey.TriggeredActions.Remove(targetAction);
         }
 
         void ResetAllActionDropdowns()
@@ -255,7 +321,6 @@ namespace DaocLauncher
                     break;
                 case HotkeyActionType.EchoSay:
                     {
-                        txtAddActionText.Visibility = Visibility.Visible;
                     }
                     break;
                 case HotkeyActionType.EnableAllHotkeys:
@@ -347,6 +412,22 @@ namespace DaocLauncher
         private void txtDescription_LostFocus(object sender, RoutedEventArgs e)
         {
             TheHotKey.Description = txtDescription.Text;
+        }
+
+        private string previousActionCountText = "0";
+        private void txtAddActionCount_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int count = 0;
+            if (string.IsNullOrEmpty(txtAddActionCount.Text) || int.TryParse(txtAddActionCount.Text, out count))
+            {
+                // Empty || numeric is fine
+                previousActionCountText = count.ToString();
+            }
+            else
+            {
+                txtAddActionCount.Text = previousActionCountText;
+                txtAddActionCount.CaretIndex = txtAddActionCount.Text.Length;
+            }
         }
     }
 }

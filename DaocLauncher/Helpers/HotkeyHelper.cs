@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -36,7 +37,7 @@ namespace DaocLauncher.Helpers
         ToggleAllHotkeysOnOff,
     }
 
-    public class HotKeyAction : IDragAndDropListBoxItem
+    public class HotKeyAction : IDragAndDropListBoxItem, ICloneable 
     {
         public string? GroupName { get; set; } // Casters, healers
         public int? Count { get; set; } // for use with things like pause
@@ -55,7 +56,7 @@ namespace DaocLauncher.Helpers
         /// <param name="modifierKeyToSend">A modifier key so we can send something like Shift-1 or Alt-f</param>
         /// <param name="text">For use with things like slash command</param>
         /// <param name="actionType">From the enum</param>
-        public HotKeyAction(string? groupName, int? count, VirtualKeyCode? keyToSend, VirtualKeyCode? modifierKeyToSend, string? text, HotkeyActionType actionType)
+        public HotKeyAction(string? groupName, int? count, VirtualKeyCode? keyToSend, VirtualKeyCode? modifierKeyToSend, string? text, HotkeyActionType actionType, int sortID)
         {
             GroupName = groupName;
             Count = count;
@@ -63,6 +64,7 @@ namespace DaocLauncher.Helpers
             ModifierKeyToSend = modifierKeyToSend;
             Text = text;
             ActionType = actionType;
+            SortOrderID = sortID;
         }
 
         public override string ToString()
@@ -110,6 +112,11 @@ namespace DaocLauncher.Helpers
             return result;
         }
 
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
         public HotKeyAction()
         {
             
@@ -129,15 +136,24 @@ namespace DaocLauncher.Helpers
         private bool AmIDisposed = false;
         public Key Key { get; set; }
         public KeyModifier KeyModifiers { get; set; }
-        public Action<HotKey>? HotKeyAction { get; set; }
-        public int Id { get; set; }
+        public Action<HotKey>? HotKeyActionEvent { get; set; }
+        public int Id { get; set; }// AMM TODO might need a better unique id, this is more for the system call
         public string Description { get; set; }
+        public ObservableCollection<HotKeyAction> TriggeredActions { get; set; }
 
-        public HotKey(Key k, KeyModifier keyModifiers, string description)
+        public HotKey()
         {
+
+        }
+
+        public HotKey(Key k, KeyModifier keyModifiers, string description, ObservableCollection<HotKeyAction> actions)
+        {
+            TriggeredActions = actions;
             Key = k;
             KeyModifiers = keyModifiers;
             Description = description;
+            int virtualKeyCode = KeyInterop.VirtualKeyFromKey(k);
+            Id = virtualKeyCode + ((int)keyModifiers * 0x10000);
         }
 
         public override string ToString()
@@ -149,7 +165,7 @@ namespace DaocLauncher.Helpers
 
         public bool Register(Action<HotKey> action)
         {
-            HotKeyAction = action;
+            HotKeyActionEvent = action;
             int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
             Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
             bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);
@@ -168,9 +184,9 @@ namespace DaocLauncher.Helpers
             {
                 if (msg.message == WmHotKey)
                 {
-                    if (HotKeyAction != null && (int)msg.wParam == Id)
+                    if (HotKeyActionEvent != null && (int)msg.wParam == Id)
                     {
-                        HotKeyAction.Invoke(this);
+                        HotKeyActionEvent.Invoke(this);
                     }
                     handled = true;
                 }
