@@ -6,43 +6,47 @@
              xmlns:local="clr-namespace:DaocLauncher"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <ScrollViewer>
-        <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="Existing Sets" FontSize="16" Margin="10,0"></TextBlock>
-                <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="14" 
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Existing Sets" FontSize="16" Margin="10,0"></TextBlock>
+            <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="14" 
                           ItemsSource="{Binding MacroSetNames}" SelectionChanged="ddlExistingSets_SelectionChanged">
-                </ComboBox>
-                <Button Name="btnEditMacroSet" Content="Edit Set" Margin="10,0" Click="btnEditMacroSet_Click"></Button>
-                <Button Name="btnNewMacroSet" Content="New Set" Margin="10,0" Click="btnNewMacroSet_Click"></Button>
-                <Button Name="btnDeleteMacroSet" Content="Delete Selected Set" Margin="10,0" 
-                        Click="btnDeleteMacroSet_Click" Visibility="Collapsed"></Button>                
-            </StackPanel>
-            <StackPanel Orientation="Vertical">
-                <ListView x:Name="lstHotkeys" ItemsSource="{Binding Path=CurrentSet.HotKeyCollection}" 
-                          HorizontalAlignment="Stretch" MouseDoubleClick="lstHotkeys_MouseDoubleClick"
-                          SelectionMode="Single">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock FontSize="16" Text="{Binding }"></TextBlock>
-                                <ItemsControl ItemsSource="{Binding TriggeredActions}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>                                            
-                                            <StackPanel Orientation="Vertical"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock FontSize="14" Margin="10,0,0,0" Text="{Binding}"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </StackPanel>
+            </ComboBox>
+            <Button Name="btnEditMacroSet" FontSize="16" Content="Edit Set" Margin="10,0" Click="btnEditMacroSet_Click"></Button>
+            <Button Name="btnNewMacroSet" FontSize="16" Content="New Set" Margin="10,0" Click="btnNewMacroSet_Click"></Button>
+            <Button Name="btnDeleteMacroSet" FontSize="16" Content="Delete Selected Set" Margin="10,0" 
+                        Click="btnDeleteMacroSet_Click" Visibility="Collapsed"></Button>
         </StackPanel>
-    </ScrollViewer>
+        <Button Name="btnAddHotkeyToSet" FontSize="16" Content=" Add Hotkey To Set " Grid.Row="1" Margin="0,0,0,10" Click="btnAddHotkeyToSet_Click" HorizontalAlignment="Left"/>
+        <ListView x:Name="lstHotkeys" ItemsSource="{Binding Path=CurrentSet.HotKeyCollection}" Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                          HorizontalAlignment="Stretch" MouseDoubleClick="lstHotkeys_MouseDoubleClick" 
+                          SelectionMode="Single">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock FontSize="16" Text="{Binding }"></TextBlock>
+                        <ItemsControl ItemsSource="{Binding TriggeredActions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock FontSize="14" Margin="10,0,0,0" Text="{Binding}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+    
 </UserControl>

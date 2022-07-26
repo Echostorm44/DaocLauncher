@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -123,7 +124,7 @@ namespace DaocLauncher.Helpers
         }
     }
 
-    public class HotKey : IDisposable
+    public class HotKey : IDisposable, INotifyPropertyChanged
     {
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, UInt32 fsModifiers, UInt32 vlc);
@@ -134,11 +135,56 @@ namespace DaocLauncher.Helpers
         public const int WmHotKey = 0x0312;
 
         private bool AmIDisposed = false;
-        public Key Key { get; set; }
-        public KeyModifier KeyModifiers { get; set; }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        Key key;
+        public Key Key
+        {
+            get => key;
+            set
+            {
+                if (key == value)
+                {
+                    return;
+                }
+
+                key = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Key)));
+            }
+        }
+        KeyModifier keyModifiers;
+        public KeyModifier KeyModifiers
+        {
+            get => keyModifiers;
+            set
+            {
+                if (keyModifiers == value)
+                {
+                    return;
+                }
+
+                keyModifiers = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeyModifiers)));
+            }
+        }
         public Action<HotKey>? HotKeyActionEvent { get; set; }
         public int Id { get; set; }// AMM TODO might need a better unique id, this is more for the system call
-        public string Description { get; set; }
+        string description;
+        public string Description
+        {
+            get => description;
+            set
+            {
+                if (description == value)
+                {
+                    return;
+                }
+
+                description = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Description)));
+            }
+        }
         public ObservableCollection<HotKeyAction> TriggeredActions { get; set; }
 
         public HotKey()

@@ -20,7 +20,7 @@ namespace DaocLauncher
     public partial class KeyPrompt : Window
     {
         public string LabelText { get; set; }
-        public char TargetCharacter { get; set; }
+        public char? TargetCharacter { get; set; }
         public Key KeyResult { get; set; }
 
         public KeyPrompt()
@@ -32,7 +32,7 @@ namespace DaocLauncher
             ResponseTextBox.Focus();
         }
 
-        public KeyPrompt(string labelText,  char targetCharacter)
+        public KeyPrompt(string labelText,  char? targetCharacter)
         {
             LabelText = labelText;
             TargetCharacter = targetCharacter;
@@ -56,7 +56,7 @@ namespace DaocLauncher
 
         private void ResponseTextBox_KeyUp(object sender, KeyEventArgs e)
         {
-            if (!string.IsNullOrEmpty(ResponseTextBox.Text) && ResponseTextBox.Text.ToCharArray()[0] == TargetCharacter)
+            if (!string.IsNullOrEmpty(ResponseTextBox.Text) && (TargetCharacter == null || ResponseTextBox.Text.ToCharArray()[0] == TargetCharacter))
             {
                 KeyResult = e.Key;
                 ResponseTextBox.IsEnabled = false;

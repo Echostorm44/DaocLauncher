@@ -27,6 +27,9 @@ namespace DaocLauncher.Models
         }
         // eg PBAOE: [ "Harry", "Sally", "Paul" ], Melee: ["Blocker1"]
         Dictionary<string, ObservableCollection<string>> categoryGroups;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public Dictionary<string, ObservableCollection<string>> CategoryGroups
         {
             get => categoryGroups;
@@ -50,6 +53,5 @@ namespace DaocLauncher.Models
             HotKeyCollection = hotKeyCollection;
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

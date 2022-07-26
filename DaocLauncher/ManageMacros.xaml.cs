@@ -35,6 +35,22 @@ namespace DaocLauncher
 
         public ManageMacros()
         {
+            if (MainWindow.GenSettings != null && (MainWindow.GenSettings.WackKey == null || MainWindow.GenSettings.SingleQuoteKey == null))
+            {
+                // These two keys are hardcoded to open your chat box but they can be different on different keyboards so I want to get them before we start
+                // making macros so that I know when to pause listening so you can type in chat without setting off a bunch of nukes && heals
+                KeyPrompt keyPrompt = new KeyPrompt("Press your / key", '/');  
+                if (keyPrompt.ShowDialog() == true)
+                {
+                    MainWindow.GenSettings.WackKey = keyPrompt.KeyResult;
+                }
+                keyPrompt = new KeyPrompt("Press your ' key", "'".ToCharArray()[0]);  
+                if (keyPrompt.ShowDialog() == true)
+                {
+                    MainWindow.GenSettings.SingleQuoteKey = keyPrompt.KeyResult;
+                }
+                GeneralHelpers.SaveGeneralSettingsToDisk(MainWindow.GenSettings);
+            }
             MacroSets = new ObservableCollection<MacroSet>();
             GroupCategories = GeneralHelpers.LoadMacroGroupCategoriesListFromDisk();
             MacroSetNames = new ObservableCollection<string>();
@@ -79,36 +95,32 @@ namespace DaocLauncher
                 new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.ToggleAllHotkeysOnOff, 1) }));
             set.HotKeyCollection.Add(new HotKey(Key.Escape, KeyModifier.None, "Enable hotkeys in case leaving chat",
                 new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.EnableAllHotkeys, 2) }));
-            
-            set.HotKeyCollection.Add(new HotKey(Key.D2, KeyModifier.None, "PBAOE Nuke",
-                new ObservableCollection<HotKeyAction>() 
-                { 
-                    new HotKeyAction("PBAOE", null, VirtualKeyCode.VK_2, null, null, HotkeyActionType.GroupKeyCommand, 1),
-                    new HotKeyAction("Melee", null, null, null, null, HotkeyActionType.AssistActiveWindow, 2),
-                    new HotKeyAction("Blocker", null, null, null, null, HotkeyActionType.AssistActiveWindow, 3),
-                    new HotKeyAction(null, 150, null, null, null, HotkeyActionType.PauseScript, 4),
-                    new HotKeyAction("Melee", null, null, null, "/stick", HotkeyActionType.SlashCommand, 5),
-                    new HotKeyAction("Melee", null, VirtualKeyCode.VK_4, VirtualKeyCode.ALT, null, HotkeyActionType.GroupKeyCommand, 6),
-                    new HotKeyAction("Blocker", null, null, null, "/face", HotkeyActionType.SlashCommand, 7),
-                }));
+            // Just for testing
+            //set.HotKeyCollection.Add(new HotKey(Key.D2, KeyModifier.None, "PBAOE Nuke",
+            //    new ObservableCollection<HotKeyAction>() 
+            //    { 
+            //        new HotKeyAction("PBAOE", null, VirtualKeyCode.VK_2, null, null, HotkeyActionType.GroupKeyCommand, 1),
+            //        new HotKeyAction("Melee", null, null, null, null, HotkeyActionType.AssistActiveWindow, 2),
+            //        new HotKeyAction("Blocker", null, null, null, null, HotkeyActionType.AssistActiveWindow, 3),
+            //        new HotKeyAction(null, 150, null, null, null, HotkeyActionType.PauseScript, 4),
+            //        new HotKeyAction("Melee", null, null, null, "/stick", HotkeyActionType.SlashCommand, 5),
+            //        new HotKeyAction("Melee", null, VirtualKeyCode.VK_4, VirtualKeyCode.ALT, null, HotkeyActionType.GroupKeyCommand, 6),
+            //        new HotKeyAction("Blocker", null, null, null, "/face", HotkeyActionType.SlashCommand, 7),
+            //    }));
 
             set.HotKeyCollection.Add(new HotKey(Key.R, KeyModifier.None, "Disable hotkeys for chat reply",
                 new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys, 1) }));
 
-            //KeyPrompt keyPrompt = new KeyPrompt("Press your / key", '/');  // Add one for reply as well since key isn't hard coded
-            //if (keyPrompt.ShowDialog() == true)
-            //{
-            //    set.HotKeyCollection.Add(new HotKey(keyPrompt.KeyResult, KeyModifier.None, "Disable hotkeys while typing in chat"),
-            //    new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.Disable) });
-            //}
-            //keyPrompt = new KeyPrompt("Press your ' key", "'".ToCharArray()[0]);
-            //if (keyPrompt.ShowDialog() == true)
-            //{
-            //    set.HotKeyCollection.Add(new HotKey(keyPrompt.KeyResult, KeyModifier.None, "Disable hotkeys while typing in chat"),
-            //    new List<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.Disable) });
-            //}
+            if (MainWindow.GenSettings != null && MainWindow.GenSettings.WackKey != null && MainWindow.GenSettings.SingleQuoteKey != null)
+            {
+                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.WackKey.Value, KeyModifier.None, "Disable hotkeys while typing in chat",
+                    new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys, 1) }));
+                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.SingleQuoteKey.Value, KeyModifier.None, "Disable hotkeys while typing in chat",
+                    new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys, 1) }));
+            }
+
             MacroSets.Add(set);
-            //GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
+            GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
             CurrentSet = set;
             MacroSetNames.Add(name);
             ddlExistingSets.SelectedValue = name;
@@ -160,7 +172,8 @@ namespace DaocLauncher
             var existingHotKey = CurrentSet.HotKeyCollection.SingleOrDefault(a => a.Id == hotWindow.TheHotKey.Id);
             if (existingHotKey != null)
             {
-                existingHotKey = hotWindow.TheHotKey;
+                CurrentSet.HotKeyCollection.Remove(existingHotKey);// so the binding updates
+                CurrentSet.HotKeyCollection.Add(hotWindow.TheHotKey);
                 var macroEntry = MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Single(a => a.Id == hotWindow.TheHotKey.Id);
                 macroEntry = hotWindow.TheHotKey;
             }
@@ -170,6 +183,15 @@ namespace DaocLauncher
                 MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Add(hotWindow.TheHotKey);
             }
             GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
+        }
+
+        private void btnAddHotkeyToSet_Click(object sender, RoutedEventArgs e)
+        {
+            KeyPrompt keyPrompt = new KeyPrompt("Press a key", null);
+            if (keyPrompt.ShowDialog() == true)
+            {
+                MainWindow.GenSettings.WackKey = keyPrompt.KeyResult;
+            }
         }
     }
 }
