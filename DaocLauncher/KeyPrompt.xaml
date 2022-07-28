@@ -8,7 +8,7 @@
         Topmost="True" WindowStyle="SingleBorderWindow" SizeToContent="WidthAndHeight">
     <StackPanel Margin="10">
         <TextBlock Text="{Binding LabelText}" />
-        <TextBox x:Name="ResponseTextBox" Width="350" KeyUp="ResponseTextBox_KeyUp" />
+        <TextBox x:Name="ResponseTextBox" Width="350" PreviewKeyDown="ResponseTextBox_PreviewKeyDown" PreviewKeyUp="ResponseTextBox_PreviewKeyUp" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Name="btnOK" Click="btnOK_Click" Content="OK" Width="60" Height="20" Margin="10" IsEnabled="False" />
             <Button Name="btnTryAgain" Click="btnTryAgain_Click" Content="Try Again" Width="70" Height="20" Margin="10" IsEnabled="False" />

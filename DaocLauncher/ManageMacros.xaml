@@ -9,21 +9,66 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="35"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="40"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
-            <TextBlock Text="Existing Sets" FontSize="16" Margin="10,0"></TextBlock>
-            <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="14" 
+            <TextBlock Text="Sets" FontSize="16" Margin="10,0" VerticalAlignment="Center"></TextBlock>
+            <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="16" 
                           ItemsSource="{Binding MacroSetNames}" SelectionChanged="ddlExistingSets_SelectionChanged">
             </ComboBox>
-            <Button Name="btnEditMacroSet" FontSize="16" Content="Edit Set" Margin="10,0" Click="btnEditMacroSet_Click"></Button>
-            <Button Name="btnNewMacroSet" FontSize="16" Content="New Set" Margin="10,0" Click="btnNewMacroSet_Click"></Button>
-            <Button Name="btnDeleteMacroSet" FontSize="16" Content="Delete Selected Set" Margin="10,0" 
-                        Click="btnDeleteMacroSet_Click" Visibility="Collapsed"></Button>
+            <Button Name="btnEditMacroSet" FontSize="16" Margin="10,0" Click="btnEditMacroSet_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Viewbox Width="16" Height="16" Margin="10,0,0,0">
+                            <Path Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                Data="M421.7 220.3L188.5 453.4L154.6 419.5L158.1 416H112C103.2 416 96 408.8 96 400V353.9L92.51 357.4C87.78 362.2 84.31 368 82.42 374.4L59.44 452.6L137.6 429.6C143.1 427.7 149.8 424.2 154.6 419.5L188.5 453.4C178.1 463.8 165.2 471.5 151.1 475.6L30.77 511C22.35 513.5 13.24 511.2 7.03 504.1C.8198 498.8-1.502 489.7 .976 481.2L36.37 360.9C40.53 346.8 48.16 333.9 58.57 323.5L291.7 90.34L421.7 220.3zM492.7 58.75C517.7 83.74 517.7 124.3 492.7 149.3L444.3 197.7L314.3 67.72L362.7 19.32C387.7-5.678 428.3-5.678 453.3 19.32L492.7 58.75z">
+                            </Path>
+                        </Viewbox>
+                        <TextBlock Text="Edit Set" FontSize="16" Margin="10,0,10,0"></TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="btnNewMacroSet" FontSize="16" Margin="10,0" Click="btnNewMacroSet_Click">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Viewbox Width="16" Height="16" Margin="10,0,0,0">
+                            <Path Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                  Data="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z">                            
+                            </Path>
+                        </Viewbox>
+                        <TextBlock Text="New Set" FontSize="16" Margin="10,0,10,0"></TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+            <Button Name="btnDeleteMacroSet" FontSize="16" Margin="10,0" 
+                        Click="btnDeleteMacroSet_Click" Visibility="Collapsed">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <Viewbox Width="16" Height="16" Margin="10,0,0,0">
+                            <Path Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                Data="M160 400C160 408.8 152.8 416 144 416C135.2 416 128 408.8 128 400V192C128 183.2 135.2 176 144 176C152.8 176 160 183.2 160 192V400zM240 400C240 408.8 232.8 416 224 416C215.2 416 208 408.8 208 400V192C208 183.2 215.2 176 224 176C232.8 176 240 183.2 240 192V400zM320 400C320 408.8 312.8 416 304 416C295.2 416 288 408.8 288 400V192C288 183.2 295.2 176 304 176C312.8 176 320 183.2 320 192V400zM317.5 24.94L354.2 80H424C437.3 80 448 90.75 448 104C448 117.3 437.3 128 424 128H416V432C416 476.2 380.2 512 336 512H112C67.82 512 32 476.2 32 432V128H24C10.75 128 0 117.3 0 104C0 90.75 10.75 80 24 80H93.82L130.5 24.94C140.9 9.357 158.4 0 177.1 0H270.9C289.6 0 307.1 9.358 317.5 24.94H317.5zM151.5 80H296.5L277.5 51.56C276 49.34 273.5 48 270.9 48H177.1C174.5 48 171.1 49.34 170.5 51.56L151.5 80zM80 432C80 449.7 94.33 464 112 464H336C353.7 464 368 449.7 368 432V128H80V432z">
+                            </Path>
+                        </Viewbox>
+                        <TextBlock Text="Delete Set" FontSize="16" Margin="10,0,10,0"></TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
         </StackPanel>
-        <Button Name="btnAddHotkeyToSet" FontSize="16" Content=" Add Hotkey To Set " Grid.Row="1" Margin="0,0,0,10" Click="btnAddHotkeyToSet_Click" HorizontalAlignment="Left"/>
+        <Button Name="btnAddHotkeyToSet" FontSize="16" Grid.Row="1" Margin="0,0,0,10" Click="btnAddHotkeyToSet_Click" 
+                HorizontalAlignment="Left" Visibility="Collapsed">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <Viewbox Width="16" Height="16" Margin="10,0,0,0">
+                        <Path Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                                  Data="M432 256c0 17.69-14.33 32.01-32 32.01H256v144c0 17.69-14.33 31.99-32 31.99s-32-14.3-32-31.99v-144H48c-17.67 0-32-14.32-32-32.01s14.33-31.99 32-31.99H192v-144c0-17.69 14.33-32.01 32-32.01s32 14.32 32 32.01v144h144C417.7 224 432 238.3 432 256z">
+                        </Path>
+                    </Viewbox>
+                    <TextBlock Text="Add Hotkey To Set" FontSize="16" Margin="10,0,10,0"></TextBlock>
+                </StackPanel>
+            </Button.Content>
+        </Button>
         <ListView x:Name="lstHotkeys" ItemsSource="{Binding Path=CurrentSet.HotKeyCollection}" Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Auto"
                           HorizontalAlignment="Stretch" MouseDoubleClick="lstHotkeys_MouseDoubleClick" 
                           SelectionMode="Single">

@@ -148,10 +148,12 @@ namespace DaocLauncher
             if (ddlExistingSets.SelectedValue != null)
             {
                 btnDeleteMacroSet.Visibility = Visibility.Visible;
+                btnAddHotkeyToSet.Visibility = Visibility.Visible;
                 CurrentSet = MacroSets.Single(a => a.Name == ddlExistingSets.SelectedValue.ToString());
             }
             else
             {
+                btnAddHotkeyToSet.Visibility = Visibility.Hidden;
                 btnDeleteMacroSet.Visibility = Visibility.Hidden;
                 CurrentSet = null;
             }
@@ -190,7 +192,11 @@ namespace DaocLauncher
             KeyPrompt keyPrompt = new KeyPrompt("Press a key", null);
             if (keyPrompt.ShowDialog() == true)
             {
-                MainWindow.GenSettings.WackKey = keyPrompt.KeyResult;
+                if (CurrentSet.HotKeyCollection.Any(a => a.Key == keyPrompt.KeyResult && a.KeyModifiers == keyPrompt.KeyModifier))
+                {
+                    MessageBox.Show("That key combination is already defined. You forgot didn't you? You forget a lot of things lately but you don't forget that you have to pause to remember things a few times a day now. You should go see a doctor but that would make it real and what would be the point? Someday it will have all faded away and you'll be left sitting in a white room in a nightmare of confusion, barely able to eat and pissing yourself. Don't worry, you won't remember your shame around the nurses that have to clean you up, you're just a goldfish, eating, shitting and staring without comprehension at a world eager to forget you in the same way you have forgotten the hotkeys you've already entered here dummy.", "Keys Already Defined");
+                    return;                                        
+                }                
             }
         }
     }
