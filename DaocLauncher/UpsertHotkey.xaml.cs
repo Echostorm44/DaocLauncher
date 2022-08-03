@@ -27,9 +27,11 @@ namespace DaocLauncher
         public List<string> GroupCategories { get; set; }
         public List<VirtualKeyCode> PossibleVirtualKeyCodes { get; set; }
         public List<string> HotKeyMods { get; set; }
-        
+        public bool DeleteMe { get; set; }
+
         public UpsertHotkey(HotKey key, List<string> groupCategories)
         {
+            DeleteMe = false;
             GroupCategories = groupCategories;
             ActionTypeNames = Enum.GetNames(typeof(HotkeyActionType)).ToList();
             TheHotKey = key;
@@ -89,12 +91,16 @@ namespace DaocLauncher
                 MessageBox.Show("Set your hotkey first");
                 return;
             }
-
+            
             if (ddlAddActionType.SelectedValue == null || !Enum.TryParse(ddlAddActionType.SelectedValue.ToString(), out HotkeyActionType selectedActionType))
             {
                 return;
             }
-
+            int nextSortID = 0;
+            if (TheHotKey.TriggeredActions.Count > 0)
+            {
+                nextSortID = TheHotKey.TriggeredActions.Max(a => a.SortOrderID);
+            }
             switch (selectedActionType)
             {
                 case HotkeyActionType.AllKeyCommand:
@@ -130,7 +136,7 @@ namespace DaocLauncher
                         }
 
                         var act = new HotKeyAction(null, null, (VirtualKeyCode)ddlAddActionKeyToSend.SelectedValue,
-                            modKey, null, HotkeyActionType.AllKeyCommand, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            modKey, null, HotkeyActionType.AllKeyCommand, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -142,28 +148,28 @@ namespace DaocLauncher
                             return;
                         }
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
-                            null, null, HotkeyActionType.AssistActiveWindow, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.AssistActiveWindow, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.DisableAllHotkeys:
                     {
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.DisableAllHotkeys, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.DisableAllHotkeys, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.EchoSay:
                     {       
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.EchoSay, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.EchoSay, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.EnableAllHotkeys:
                     {
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.EnableAllHotkeys, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.EnableAllHotkeys, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -203,14 +209,14 @@ namespace DaocLauncher
 
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, 
                             (VirtualKeyCode)ddlAddActionKeyToSend.SelectedValue,
-                            modKey, null, HotkeyActionType.GroupKeyCommand, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            modKey, null, HotkeyActionType.GroupKeyCommand, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.InviteAllWindowsToGroup:
                     {
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.InviteAllWindowsToGroup, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.InviteAllWindowsToGroup, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -222,7 +228,7 @@ namespace DaocLauncher
                             return;
                         }
                         var act = new HotKeyAction(null, count, null,
-                            null, null, HotkeyActionType.PauseScript, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.PauseScript, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -234,14 +240,14 @@ namespace DaocLauncher
                             return;
                         }
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
-                            null, txtAddActionText.Text, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, txtAddActionText.Text, HotkeyActionType.SlashPrompt, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.SlashPrompt:
                     {
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.SlashPrompt, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -253,14 +259,14 @@ namespace DaocLauncher
                             return;
                         }
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
-                            null, null, HotkeyActionType.SlashPrompt, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.SlashPrompt, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
                 case HotkeyActionType.ToggleAllHotkeysOnOff:
                     {
                         var act = new HotKeyAction(null, null, null,
-                            null, null, HotkeyActionType.ToggleAllHotkeysOnOff, TheHotKey.TriggeredActions.Max(a => a.SortOrderID));
+                            null, null, HotkeyActionType.ToggleAllHotkeysOnOff, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;
@@ -427,6 +433,16 @@ namespace DaocLauncher
             {
                 txtAddActionCount.Text = previousActionCountText;
                 txtAddActionCount.CaretIndex = txtAddActionCount.Text.Length;
+            }
+        }
+
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var result = MessageBox.Show("Are you sure? This will return the hotkey to the void from which we all come and ultimately return to. Do not weep for this hotkey for its suffering is at an end, yours is only begining. ", "Delete Hotkey", MessageBoxButton.OKCancel);
+            if (result == MessageBoxResult.OK)
+            {
+                DeleteMe = true;
+                this.Close();
             }
         }
     }

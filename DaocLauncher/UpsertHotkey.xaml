@@ -5,52 +5,53 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaocLauncher"
         xmlns:helpers="clr-namespace:DaocLauncher.Helpers" d:DataContext="{d:DesignInstance Type=local:ManageMacros}"
-        mc:Ignorable="d" Width="750" Height="440"
+        mc:Ignorable="d" Width="850" Height="440"
         Title="Upsert Hotkey" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <helpers:CleanVkEnumToString x:Key="VkEnumConverter" />
     </Window.Resources>
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
-            <RowDefinition Height="35"></RowDefinition>
+            <RowDefinition Height="29"></RowDefinition>
+            <RowDefinition Height="39"></RowDefinition>
+            <RowDefinition Height="39"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0">
-            <TextBlock Text="Key" FontSize="15" Margin="0,0,8,0"></TextBlock>
-            <TextBox Name="txtHotKey" FontSize="15" Width="350" Margin="0,0,8,0" KeyUp="txtHotKey_KeyUp" MaxLength="1"></TextBox>
-            <TextBlock Text="Key Modifier" FontSize="15" Margin="0,0,8,0"></TextBlock>
-            <ComboBox Name="ddlKeyMod" FontSize="15" Width="120" Margin="0,0,180,0" ItemsSource="{Binding HotKeyMods}" SelectionChanged="ddlKeyMod_SelectionChanged"></ComboBox>
-            <Button Name="btnDone" Content="Done" FontSize="15" Click="btnDone_Click"></Button>
+            <TextBlock Text="Key" FontSize="16" Margin="0,0,8,0"></TextBlock>
+            <TextBox Name="txtHotKey" FontSize="16" Width="350" Margin="0,0,8,0" KeyUp="txtHotKey_KeyUp" MaxLength="1"></TextBox>
+            <TextBlock Text="Key Modifier" FontSize="16" Margin="0,0,8,0"></TextBlock>
+            <ComboBox Name="ddlKeyMod" FontSize="16" Width="120" Margin="0,0,30,0" ItemsSource="{Binding HotKeyMods}" SelectionChanged="ddlKeyMod_SelectionChanged"></ComboBox>
+            <Button Name="btnDone" Content="Done" FontSize="16" Click="btnDone_Click"></Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Row="1">
-            <TextBlock Text="Description" FontSize="15" Margin="0,0,8,0"></TextBlock>
-            <TextBox x:Name="txtDescription" FontSize="15" Width="739" Margin="0,0,10,0" LostFocus="txtDescription_LostFocus"></TextBox>
+            <TextBlock Text="Description" FontSize="16" Margin="0,0,8,0"></TextBlock>
+            <TextBox x:Name="txtDescription" FontSize="16" MinWidth="520" Margin="0,0,10,0" LostFocus="txtDescription_LostFocus"></TextBox>
+            <Button Name="btnDelete" Content="Delete" FontSize="16" Click="btnDelete_Click"></Button>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Grid.Row="2">
-            <ComboBox Name="ddlAddActionType" FontSize="15" Width="180" Margin="0,0,8,0" 
+            <ComboBox Name="ddlAddActionType" FontSize="16" Width="190" Margin="0,0,8,0" 
                       ItemsSource="{Binding ActionTypeNames}"
                       SelectionChanged="ddlAddActionType_SelectionChanged"></ComboBox>
-            <ComboBox Name="ddlAddActionGroupName" FontSize="15" Width="180" Margin="0,0,8,0" 
+            <ComboBox Name="ddlAddActionGroupName" FontSize="16" Width="140" Margin="0,0,8,0" 
                       ItemsSource="{Binding GroupCategories}"
                       Visibility="Collapsed"></ComboBox>
-            <TextBox Name="txtAddActionCount" FontSize="15" Width="70" ToolTip="Count in milliseconds" Margin="0,0,8,0" TextChanged="txtAddActionCount_TextChanged" Visibility="Collapsed"></TextBox>
-            <ComboBox Name="ddlAddActionKeyToSend" FontSize="15" Width="180" Margin="0,0,8,0" Visibility="Collapsed" ItemsSource="{Binding PossibleVirtualKeyCodes}">
+            <TextBox Name="txtAddActionCount" FontSize="16" Width="70" ToolTip="Count in milliseconds" Margin="0,0,8,0" TextChanged="txtAddActionCount_TextChanged" Visibility="Collapsed"></TextBox>
+            <ComboBox Name="ddlAddActionKeyToSend" FontSize="16" Width="65" Margin="0,0,8,0" Visibility="Collapsed" ItemsSource="{Binding PossibleVirtualKeyCodes}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock FontSize="16" Text="{Binding ., Converter={StaticResource VkEnumConverter} }"></TextBlock>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            <ComboBox Name="ddlAddActionModifierToSend" FontSize="15" Width="180" Margin="0,0,8,0" Visibility="Collapsed">
+            <ComboBox Name="ddlAddActionModifierToSend" FontSize="16" Width="80" Margin="0,0,8,0" Visibility="Collapsed">
                 <ComboBoxItem Content="None"/>
                 <ComboBoxItem Content="Shift"/>
                 <ComboBoxItem Content="Alt"/>
                 <ComboBoxItem Content="Control"/>
             </ComboBox>
-            <TextBox Name="txtAddActionText" FontSize="15" Width="70" ToolTip="" Margin="0,0,8,0" Visibility="Collapsed"></TextBox>
-            <Button Name="btnAddAction" Content="Add" FontSize="15" Click="btnAddAction_Click"></Button>
+            <TextBox Name="txtAddActionText" FontSize="16" Width="80" ToolTip="" Margin="0,0,8,0" Visibility="Collapsed"></TextBox>
+            <Button Name="btnAddAction" Content="Add" FontSize="16" Click="btnAddAction_Click"></Button>
         </StackPanel>
         <helpers:HotKeyActionDragDropListBox x:Name="lstHotKeyActions" ItemsSource="{Binding Path=TheHotKey.TriggeredActions}" Grid.Row="3"
                                              ScrollViewer.VerticalScrollBarVisibility="Auto" Margin="0,15,0,0">

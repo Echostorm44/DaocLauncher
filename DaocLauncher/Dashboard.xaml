@@ -14,7 +14,6 @@
                 </ComboBox>
                 <Button Name="btnToggleMacroSet" Content="Run Macro Set" Margin="10,0" Click="btnToggleMacroSet_Click"></Button>
                 <TextBlock Name="lblMacoState" Text="No Macros Active" FontSize="16"></TextBlock>
-                <TextBox KeyDown="TextBox_KeyDown" Width="100"></TextBox>
             </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Accounts" FontSize="16" HorizontalAlignment="Center"></TextBlock>

@@ -6,30 +6,18 @@
              xmlns:local="clr-namespace:DaocLauncher"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"></RowDefinition>
-            <RowDefinition Height="40"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
             <TextBlock Text="Sets" FontSize="16" Margin="10,0" VerticalAlignment="Center"></TextBlock>
             <ComboBox Name="ddlExistingSets" MinWidth="250" FontSize="16" 
                           ItemsSource="{Binding MacroSetNames}" SelectionChanged="ddlExistingSets_SelectionChanged">
-            </ComboBox>
-            <Button Name="btnEditMacroSet" FontSize="16" Margin="10,0" Click="btnEditMacroSet_Click">
-                <Button.Content>
-                    <StackPanel Orientation="Horizontal">
-                        <Viewbox Width="16" Height="16" Margin="10,0,0,0">
-                            <Path Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" 
-                                Data="M421.7 220.3L188.5 453.4L154.6 419.5L158.1 416H112C103.2 416 96 408.8 96 400V353.9L92.51 357.4C87.78 362.2 84.31 368 82.42 374.4L59.44 452.6L137.6 429.6C143.1 427.7 149.8 424.2 154.6 419.5L188.5 453.4C178.1 463.8 165.2 471.5 151.1 475.6L30.77 511C22.35 513.5 13.24 511.2 7.03 504.1C.8198 498.8-1.502 489.7 .976 481.2L36.37 360.9C40.53 346.8 48.16 333.9 58.57 323.5L291.7 90.34L421.7 220.3zM492.7 58.75C517.7 83.74 517.7 124.3 492.7 149.3L444.3 197.7L314.3 67.72L362.7 19.32C387.7-5.678 428.3-5.678 453.3 19.32L492.7 58.75z">
-                            </Path>
-                        </Viewbox>
-                        <TextBlock Text="Edit Set" FontSize="16" Margin="10,0,10,0"></TextBlock>
-                    </StackPanel>
-                </Button.Content>
-            </Button>
+            </ComboBox>            
             <Button Name="btnNewMacroSet" FontSize="16" Margin="10,0" Click="btnNewMacroSet_Click">
                 <Button.Content>
                     <StackPanel Orientation="Horizontal">
@@ -56,7 +44,34 @@
                 </Button.Content>
             </Button>
         </StackPanel>
-        <Button Name="btnAddHotkeyToSet" FontSize="16" Grid.Row="1" Margin="0,0,0,10" Click="btnAddHotkeyToSet_Click" 
+        <Expander Name="expanderGroups" Grid.Row="1" HorizontalAlignment="Stretch" Header="Group Settings" ExpandDirection="Down" IsExpanded="False" FontSize="16" Visibility="Collapsed">
+            <ListView x:Name="lstSetGroups" ItemsSource="{Binding Path=CurrentSet.CategoryGroups}" ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      HorizontalAlignment="Stretch" SelectionMode="Single" MouseDoubleClick="lstSetGroups_MouseDoubleClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="16" Text="{Binding Key}"></TextBlock>
+                            <TextBlock Text=": "></TextBlock>
+                            <ItemsControl ItemsSource="{Binding Value}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontSize="16" Margin="10,0,0,0" Text="{Binding}"/>                                        
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Expander>
+
+        <Button Name="btnAddHotkeyToSet" FontSize="16" Grid.Row="2" Margin="0,10,0,10" Click="btnAddHotkeyToSet_Click" 
                 HorizontalAlignment="Left" Visibility="Collapsed">
             <Button.Content>
                 <StackPanel Orientation="Horizontal">
@@ -69,7 +84,7 @@
                 </StackPanel>
             </Button.Content>
         </Button>
-        <ListView x:Name="lstHotkeys" ItemsSource="{Binding Path=CurrentSet.HotKeyCollection}" Grid.Row="2" ScrollViewer.VerticalScrollBarVisibility="Auto"
+        <ListView x:Name="lstHotkeys" ItemsSource="{Binding Path=CurrentSet.HotKeyCollection}" Grid.Row="3" ScrollViewer.VerticalScrollBarVisibility="Auto"
                           HorizontalAlignment="Stretch" MouseDoubleClick="lstHotkeys_MouseDoubleClick" 
                           SelectionMode="Single">
             <ListView.ItemTemplate>

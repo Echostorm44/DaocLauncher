@@ -60,11 +60,6 @@ namespace DaocLauncher
             this.DataContext = this;
         }
 
-        private void btnEditMacroSet_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void btnNewMacroSet_Click(object sender, RoutedEventArgs e)
         {
             var name = "";
@@ -88,7 +83,10 @@ namespace DaocLauncher
             }
             MacroSet set = new MacroSet(name, new Dictionary<string, ObservableCollection<string>>(),
                         new ObservableCollection<HotKey>());
-            set.CategoryGroups.Add(GroupCategories.First(), new ObservableCollection<string>() { "CharacterName" });
+            foreach (string groupCategory in GroupCategories)
+            {
+                set.CategoryGroups.Add(groupCategory, new ObservableCollection<string>() { "CharacterName", "AnotherName" });
+            }            
             // set some defaults to deal with chat box being active to pause macros
 
             set.HotKeyCollection.Add(new HotKey(Key.Enter, KeyModifier.None, "Toggle hotkeys on entering and leaving chat", 
@@ -113,9 +111,9 @@ namespace DaocLauncher
 
             if (MainWindow.GenSettings != null && MainWindow.GenSettings.WackKey != null && MainWindow.GenSettings.SingleQuoteKey != null)
             {
-                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.WackKey.Value, KeyModifier.None, "Disable hotkeys while typing in chat",
+                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.WackKey.Value, KeyModifier.None, "Disable hotkeys when hitting the / key which starts chat",
                     new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys, 1) }));
-                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.SingleQuoteKey.Value, KeyModifier.None, "Disable hotkeys while typing in chat",
+                set.HotKeyCollection.Add(new HotKey(MainWindow.GenSettings.SingleQuoteKey.Value, KeyModifier.None, "Disable hotkeys when hitting the ' key which starts chat",
                     new ObservableCollection<HotKeyAction>() { new HotKeyAction(null, null, null, null, null, HotkeyActionType.DisableAllHotkeys, 1) }));
             }
 
@@ -149,12 +147,14 @@ namespace DaocLauncher
             {
                 btnDeleteMacroSet.Visibility = Visibility.Visible;
                 btnAddHotkeyToSet.Visibility = Visibility.Visible;
+                expanderGroups.Visibility = Visibility.Visible;
                 CurrentSet = MacroSets.Single(a => a.Name == ddlExistingSets.SelectedValue.ToString());
             }
             else
             {
-                btnAddHotkeyToSet.Visibility = Visibility.Hidden;
-                btnDeleteMacroSet.Visibility = Visibility.Hidden;
+                expanderGroups.Visibility = Visibility.Collapsed;
+                btnAddHotkeyToSet.Visibility = Visibility.Collapsed;
+                btnDeleteMacroSet.Visibility = Visibility.Collapsed;
                 CurrentSet = null;
             }
         }
@@ -182,7 +182,11 @@ namespace DaocLauncher
             else
             {
                 CurrentSet.HotKeyCollection.Add(hotWindow.TheHotKey);
-                MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Add(hotWindow.TheHotKey);
+                //MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Add(hotWindow.TheHotKey);
+            }
+            if (hotWindow.DeleteMe)
+            {
+                CurrentSet.HotKeyCollection.Remove(hotWindow.TheHotKey);
             }
             GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
         }
@@ -195,8 +199,60 @@ namespace DaocLauncher
                 if (CurrentSet.HotKeyCollection.Any(a => a.Key == keyPrompt.KeyResult && a.KeyModifiers == keyPrompt.KeyModifier))
                 {
                     MessageBox.Show("That key combination is already defined. You forgot didn't you? You forget a lot of things lately but you don't forget that you have to pause to remember things a few times a day now. You should go see a doctor but that would make it real and what would be the point? Someday it will have all faded away and you'll be left sitting in a white room in a nightmare of confusion, barely able to eat and pissing yourself. Don't worry, you won't remember your shame around the nurses that have to clean you up, you're just a goldfish, eating, shitting and staring without comprehension at a world eager to forget you in the same way you have forgotten the hotkeys you've already entered here dummy.", "Keys Already Defined");
-                    return;                                        
-                }                
+                    return;
+                }
+                else
+                {
+                    HotKey hk = new HotKey(keyPrompt.KeyResult, keyPrompt.KeyModifier, "NA", new ObservableCollection<HotKeyAction>());
+
+                    UpsertHotkey hotWindow = new UpsertHotkey(hk, GroupCategories);
+                    hotWindow.Owner = Application.Current.MainWindow;
+                    hotWindow.ShowDialog();
+                    var existingHotKey = CurrentSet.HotKeyCollection.SingleOrDefault(a => a.Id == hotWindow.TheHotKey.Id);
+                    if (existingHotKey != null)
+                    {
+                        CurrentSet.HotKeyCollection.Remove(existingHotKey);// so the binding updates
+                        CurrentSet.HotKeyCollection.Add(hotWindow.TheHotKey);
+                        var macroEntry = MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Single(a => a.Id == hotWindow.TheHotKey.Id);
+                        macroEntry = hotWindow.TheHotKey;
+                    }
+                    else
+                    {
+                        CurrentSet.HotKeyCollection.Add(hotWindow.TheHotKey);
+                        //MacroSets.Single(a => a.Name == CurrentSet.Name).HotKeyCollection.Add(hotWindow.TheHotKey);
+                    }
+                    if (hotWindow.DeleteMe)
+                    {
+                        CurrentSet.HotKeyCollection.Remove(hotWindow.TheHotKey);
+                    }
+                    GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
+                }
+            }
+        }
+
+        private void lstSetGroups_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (lstSetGroups.SelectedItem == null)
+            {
+                return;
+            }
+            dynamic roo = lstSetGroups.SelectedItem;
+            TextPrompt tp = new TextPrompt("Enter group names separated by commas. eg Frank,Barney,Ben");
+            tp.ShowDialog();
+            if (!string.IsNullOrEmpty(tp.ResponseText))
+            {
+                var splitNames = tp.ResponseText.Split(',');
+                string groupKey = roo.Key;
+                CurrentSet.CategoryGroups[groupKey].Clear();
+                foreach (string item in splitNames)
+                {
+                    string nameToAdd = item?.Trim() ?? "";
+                    if (!string.IsNullOrEmpty(nameToAdd))
+                    {
+                        CurrentSet.CategoryGroups[groupKey].Add(nameToAdd);
+                    }                    
+                }
+                GeneralHelpers.SaveMacrosToDisk(MacroSets.ToList());
             }
         }
     }
