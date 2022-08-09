@@ -53,5 +53,27 @@ namespace DaocLauncher.Models
             HotKeyCollection = hotKeyCollection;
         }
 
+        public MacroSet DeepCopyMe()
+        {
+            var catGroups = new Dictionary<string, ObservableCollection<string>>();
+            var hotKeys = new ObservableCollection<HotKey>();
+            foreach (var cat in CategoryGroups)
+            {
+                catGroups.Add(cat.Key, cat.Value);
+            }
+            foreach (var hot in HotKeyCollection)
+            {
+                var triggerActs = new ObservableCollection<HotKeyAction>();
+                foreach (var act in hot.TriggeredActions)
+                {
+                    triggerActs.Add(act);
+                }
+                var hk = new HotKey(hot.Key, hot.KeyModifiers, hot.Description, triggerActs);
+                hotKeys.Add(hk);
+            }
+            var result = new MacroSet(Name, catGroups, hotKeys);
+            return result;
+        }
+
     }
 }

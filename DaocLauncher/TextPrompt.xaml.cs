@@ -25,12 +25,18 @@ namespace DaocLauncher
             ResponseTextBox.Focus();
         }
 
-        public TextPrompt(string labelText)
+        public TextPrompt(string labelText, string preloadText = "")
         {
+            
             LabelText = labelText;
             InitializeComponent();
+            if (!string.IsNullOrEmpty(preloadText))
+            {
+                ResponseText = preloadText;
+            }
             this.DataContext = this;
             ResponseTextBox.Focus();
+            ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
         }
 
         public string ResponseText

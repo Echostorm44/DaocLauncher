@@ -10,10 +10,14 @@
     <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Macro Sets" FontSize="16" Margin="10,0"></TextBlock>
-                <ComboBox Name="ddlMacroSets" MinWidth="250" FontSize="14" ItemsSource="{Binding MacroSets}">                    
+                <ComboBox Name="ddlMacroSets" MinWidth="250" FontSize="14" ItemsSource="{Binding MacroSets}" SelectionChanged="ddlMacroSets_SelectionChanged">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" FontSize="16"></TextBlock>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
                 </ComboBox>
-                <Button Name="btnToggleMacroSet" Content="Run Macro Set" Margin="10,0" Click="btnToggleMacroSet_Click"></Button>
-                <TextBlock Name="lblMacoState" Text="No Macros Active" FontSize="16"></TextBlock>
+                <Button Name="btnToggleMacroSet" Content="{Binding MacroStateText}" FontSize="16" Margin="10,0" Padding="10,0" Click="btnToggleMacroSet_Click"></Button>
             </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Accounts" FontSize="16" HorizontalAlignment="Center"></TextBlock>
@@ -52,11 +56,11 @@
                                 <TextBlock FontSize="16" FontWeight="Bold" Text="Default Server"></TextBlock>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="70">
+                        <GridViewColumn Width="90">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16"
+                                        <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16" Padding="10,0"
                                                 Command="{Binding Path=LaunchMyAcct, RelativeSource={RelativeSource AncestorType={x:Type local:Dashboard}} }" CommandParameter="{Binding .}"></Button>
                                     </StackPanel>
                                 </DataTemplate>
@@ -111,11 +115,11 @@
                                 <TextBlock FontSize="16" FontWeight="Bold" Text="Account"></TextBlock>
                             </GridViewColumn.Header>
                         </GridViewColumn>
-                        <GridViewColumn Width="70">
+                        <GridViewColumn Width="90">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel>
-                                        <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16"
+                                            <Button Content="Launch" Grid.Column="8" HorizontalAlignment="Right" FontSize="16" Padding="10,0"
                                                 Command="{Binding Path=LaunchChar, RelativeSource={RelativeSource AncestorType={x:Type local:Dashboard}} }" CommandParameter="{Binding .}"></Button>
                                     </StackPanel>
                                 </DataTemplate>

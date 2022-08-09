@@ -3,6 +3,8 @@ using DaocLauncher.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -22,7 +24,7 @@ namespace DaocLauncher
     /// <summary>
     /// Interaction logic for Dashboard.xaml
     /// </summary>
-    public partial class Dashboard : UserControl
+    public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         [DllImport("user32.dll")]
         static extern IntPtr GetActiveWindow();
@@ -33,9 +35,28 @@ namespace DaocLauncher
         public MacroSet ActiveMacroSet { get; set; }
         private object macroLock = new object();
         private bool macrosAreSleeping = false;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private bool MacrosAreRunning { get; set; }
+        string macroStateText;
+        public string MacroStateText
+        {
+            get => macroStateText;
+            set
+            {
+                if (macroStateText == value)
+                {
+                    return;
+                }
+
+                macroStateText = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(MacroStateText)));
+            }
+        }
         // TODO google code cave method for C# dll injection
 
-        public List<string> MacroSets { get; set; }
+        public List<MacroSet> MacroSets { get; set; }
         public List<DaocCharacter> AllCharacters { get; set; }
         public List<Server> Servers { get; set; }
         public List<string> ServerNames { get; set; }
@@ -46,31 +67,32 @@ namespace DaocLauncher
         public SendKeysTo keySender { get; private set; }
         public Dashboard()
         {
-            // Check for previously loaded chars.  In case program shutdown
-            LoadedWindows = new Dictionary<string, IntPtr>();
-            // TODO Load MacroSets
+            MacroStateText = "Start Macro Set";
+            MacrosAreRunning = false;            
+            LoadedWindows = new Dictionary<string, IntPtr>();            
             AllCharacters = GeneralHelpers.LoadCharactersFromDisk() ?? new List<DaocCharacter>();
             Servers = GeneralHelpers.LoadServerListFromDisk()?.Servers ?? new List<Server>();
             ServerNames = Servers.Select(a => a.Name).ToList();
             Accounts = GeneralHelpers.LoadAccountListFromDisk()?.MyAccounts ?? new List<DaocAccount>();
             LaunchChar = new RelayCommand(a => LaunchCharClicked(a));
             LaunchMyAcct = new RelayCommand(a => LaunchMyAccountClicked(a));
+            MacroSets = GeneralHelpers.LoadMacroSetsFromDisk();
             InitializeComponent();
             keySender = new SendKeysTo();
+
+            // Check for previously loaded chars.  In case program shutdown
+            foreach (var process in Process.GetProcesses())
+            {
+                if (process.ProcessName.Contains("game.dll"))
+                {
+                    if (!LoadedWindows.ContainsKey(process.MainWindowTitle))
+                    {
+                        LoadedWindows.Add(process.MainWindowTitle, process.MainWindowHandle);
+                    }
+                }
+            }
+
             this.DataContext = this;    
-        }
-
-        //private void Button_Click(object sender, RoutedEventArgs e)
-        //{
-        //    Button button = sender as Button;
-        //    Game game = button.DataContext as Game;
-        //    int id = game.ID;
-        //    // ...
-        //}
-
-        void Test(object param)
-        {
-            MessageBox.Show("HA!");
         }
 
         void LaunchCharClicked(object choice)
@@ -102,7 +124,10 @@ namespace DaocLauncher
             }
             var realmNumber = classLookup[selectedChar.Class];
             var windowHandle = GeneralHelpers.LaunchDaoc(selectedChar.Name, accountData.Name, accountData.Password, serverData.IP, serverData.ID, selectedChar.Name, realmNumber);
-            LoadedWindows.Add(selectedChar.Name, windowHandle);
+            if (!LoadedWindows.ContainsKey(selectedChar.Name))
+            {
+                LoadedWindows.Add(selectedChar.Name, windowHandle);
+            }            
         }
 
         void LaunchMyAccountClicked(object choice)
@@ -123,12 +148,41 @@ namespace DaocLauncher
             }
             GeneralHelpers.SaveAccountListToDisk(Accounts);// Save the default server if it changed
             var windowHandle = GeneralHelpers.LaunchDaoc(selectedAccount.DefaultTag, selectedAccount.Name, selectedAccount.Password, serverData.IP, serverData.ID, "", "");
-            LoadedWindows.Add(selectedAccount.DefaultTag, windowHandle);
+            if (!LoadedWindows.ContainsKey("selectedAccount.DefaultTag"))
+            {
+                LoadedWindows.Add(selectedAccount.DefaultTag, windowHandle);
+            }            
         }
 
         private void btnToggleMacroSet_Click(object sender, RoutedEventArgs e)
         {
-            
+            if (MacrosAreRunning) // They are already running, stop them
+            {
+                MacrosAreRunning = false;
+                macrosAreSleeping = true;
+                foreach (var hotkey in ActiveMacroSet.HotKeyCollection)
+                {
+                    hotkey.Dispose();
+                }
+                ddlMacroSets.IsEnabled = true;
+                MacroStateText = "Start Macro Set";
+            }
+            else
+            {
+                if (ddlMacroSets.SelectedItem == null)
+                {
+                    return;
+                }
+                ActiveMacroSet = ((MacroSet)ddlMacroSets.SelectedItem).DeepCopyMe();// Need a deep copy here since it will get disposed                
+                foreach (var hotkey in ActiveMacroSet.HotKeyCollection)
+                {
+                    hotkey.Register(OnHotKeyHandler);
+                }
+                MacrosAreRunning = true;
+                macrosAreSleeping = false;
+                ddlMacroSets.IsEnabled = false;
+                MacroStateText = "Stop Macro Set";
+            }
         }
 
         private void OnHotKeyHandler(HotKey hotKey)
@@ -310,11 +364,9 @@ namespace DaocLauncher
             });
         }
 
-        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        private void ddlMacroSets_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var roo = e.Key;
-            var yoo = e.Key.ToString();
-            var loo = sender;
+
         }
 
         //IntPtr windowToFind = FindWindow("DAoCMWC", "Buddyblocker");

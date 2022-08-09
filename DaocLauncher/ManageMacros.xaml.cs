@@ -237,7 +237,13 @@ namespace DaocLauncher
                 return;
             }
             dynamic roo = lstSetGroups.SelectedItem;
-            TextPrompt tp = new TextPrompt("Enter group names separated by commas. eg Frank,Barney,Ben");
+            string preloadNames = "";
+            if (CurrentSet.CategoryGroups.ContainsKey(roo.Key))
+            {
+                preloadNames = string.Join(",", CurrentSet.CategoryGroups[(string)roo.Key].ToList());                
+            }
+
+            TextPrompt tp = new TextPrompt("Enter group names separated by commas. eg Frank,Barney,Ben", preloadNames);
             tp.ShowDialog();
             if (!string.IsNullOrEmpty(tp.ResponseText))
             {
