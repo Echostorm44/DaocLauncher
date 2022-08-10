@@ -35,7 +35,10 @@ namespace DaocLauncher
         public MacroSet ActiveMacroSet { get; set; }
         private object macroLock = new object();
         private bool macrosAreSleeping = false;
-
+        public bool TextPromptIsOpen
+        {
+            get; set;
+        }
         public event PropertyChangedEventHandler? PropertyChanged;
 
         private bool MacrosAreRunning { get; set; }
@@ -79,7 +82,7 @@ namespace DaocLauncher
             MacroSets = GeneralHelpers.LoadMacroSetsFromDisk();
             InitializeComponent();
             keySender = new SendKeysTo();
-
+            TextPromptIsOpen = false;
             // Check for previously loaded chars.  In case program shutdown
             foreach (var process in Process.GetProcesses())
             {
@@ -160,10 +163,11 @@ namespace DaocLauncher
             {
                 MacrosAreRunning = false;
                 macrosAreSleeping = true;
+                ActiveMacroSet.ListeningForHotkeys = false;
                 foreach (var hotkey in ActiveMacroSet.HotKeyCollection)
                 {
                     hotkey.Dispose();
-                }
+                }                
                 ddlMacroSets.IsEnabled = true;
                 MacroStateText = "Start Macro Set";
             }
@@ -178,6 +182,7 @@ namespace DaocLauncher
                 {
                     hotkey.Register(OnHotKeyHandler);
                 }
+                ActiveMacroSet.ListeningForHotkeys = true;
                 MacrosAreRunning = true;
                 macrosAreSleeping = false;
                 ddlMacroSets.IsEnabled = false;
@@ -187,6 +192,12 @@ namespace DaocLauncher
 
         private void OnHotKeyHandler(HotKey hotKey)
         {
+            // See if the text prompt is up so we're not listening
+            if (TextPromptIsOpen == true)
+            {
+                return;
+            }
+
             // We need to check and see if the key is Enter, /, ', r, or escape to deal with the chat window being open
             // escape always closes it, /, ' and r (reply) only open it and enter toggles it
             if (hotKey.TriggeredActions.Any(a => a.ActionType == HotkeyActionType.DisableAllHotkeys || a.ActionType == HotkeyActionType.EnableAllHotkeys || a.ActionType == HotkeyActionType.ToggleAllHotkeysOnOff))
@@ -219,7 +230,7 @@ namespace DaocLauncher
             {
                 return;
             }
-            Task.Run(() =>
+            Task.Factory.StartNew(() =>
             {
                 lock (macroLock)// Prevent things from getting too crazy
                 {
@@ -284,7 +295,7 @@ namespace DaocLauncher
                                 break;
                             case HotkeyActionType.PauseScript:
                                 {
-                                    Task.Delay(act.Count ?? 10).RunSynchronously();
+                                    System.Threading.Thread.Sleep(act.Count ?? 10);
                                 }
                                 break;
                             case HotkeyActionType.GroupKeyCommand:
@@ -325,9 +336,11 @@ namespace DaocLauncher
                                 break;
                             case HotkeyActionType.EchoSay:
                                 {
+                                    TextPromptIsOpen = true;
                                     var dialog = new TextPrompt();
                                     if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
                                     {
+                                        TextPromptIsOpen = false;
                                         foreach (var win in LoadedWindows)
                                         {
                                             keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText, windowToReturnTo);
@@ -348,12 +361,14 @@ namespace DaocLauncher
                                 break;
                             case HotkeyActionType.SlashPrompt:
                                 {
+                                    TextPromptIsOpen = true;
                                     var dialog = new TextPrompt();
                                     if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
                                     {
+                                        TextPromptIsOpen = false;
                                         foreach (var win in LoadedWindows)
                                         {
-                                            keySender.SendChatCommand(win.Value, dialog.ResponseText, windowToReturnTo);
+                                            keySender.SendChatCommand(win.Value, "/" + dialog.ResponseText, windowToReturnTo);
                                         }
                                     }
                                 }
@@ -361,7 +376,7 @@ namespace DaocLauncher
                         }
                     }
                 }
-            });
+            }, System.Threading.CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void ddlMacroSets_SelectionChanged(object sender, SelectionChangedEventArgs e)

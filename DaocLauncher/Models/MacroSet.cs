@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Interop;
 using DaocLauncher.Helpers;
 namespace DaocLauncher.Models
 {
@@ -45,12 +46,43 @@ namespace DaocLauncher.Models
             }
         }
         public ObservableCollection<HotKey> HotKeyCollection { get; set; }
-        
+
+        public bool ListeningForHotkeys
+        {
+            get; set;
+        }
+        public const int WmHotKey = 0x0312;
+
         public MacroSet(string name, Dictionary<string, ObservableCollection<string>> categoryGroups, ObservableCollection<HotKey> hotKeyCollection)
         {
             Name = name;
             CategoryGroups = categoryGroups;
             HotKeyCollection = hotKeyCollection;
+            ListeningForHotkeys = false;
+            ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);            
+        }
+
+        private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
+        {
+            if (ListeningForHotkeys)
+            {
+                if (!handled)
+                {
+                    if (msg.message == WmHotKey)
+                    {
+                        var handledKey = (int)msg.wParam;
+                        var targetKey = HotKeyCollection.SingleOrDefault(a => a.Id == handledKey);
+                        if (targetKey != null)
+                        {
+                            if (targetKey.HotKeyActionEvent != null)
+                            {
+                                targetKey.HotKeyActionEvent.Invoke(targetKey);                                
+                            }
+                            handled = true;
+                        }                        
+                    }
+                }
+            }
         }
 
         public MacroSet DeepCopyMe()

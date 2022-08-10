@@ -215,7 +215,7 @@ namespace DaocLauncher.Helpers
             int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
             Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
             bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);
-            ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
+            //ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
             return result;
         }
 
@@ -224,20 +224,20 @@ namespace DaocLauncher.Helpers
             UnregisterHotKey(IntPtr.Zero, Id);
         }
 
-        private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
-        {
-            if (!handled)
-            {
-                if (msg.message == WmHotKey)
-                {
-                    if (HotKeyActionEvent != null && (int)msg.wParam == Id)
-                    {
-                        HotKeyActionEvent.Invoke(this);
-                    }
-                    handled = true;
-                }
-            }
-        }
+        //private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
+        //{
+        //    if (!handled)
+        //    {
+        //        if (msg.message == WmHotKey)
+        //        {
+        //            if (HotKeyActionEvent != null && (int)msg.wParam == Id)
+        //            {
+        //                HotKeyActionEvent.Invoke(this);
+        //            }
+        //            handled = true;
+        //        }
+        //    }
+        //}
 
         // Implement IDisposable.
         // Do not make this method virtual.
