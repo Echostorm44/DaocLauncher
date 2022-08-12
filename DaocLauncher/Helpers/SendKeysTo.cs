@@ -90,7 +90,7 @@ namespace DaocLauncher.Helpers
         }
 
 
-        private void JustSendKey(IntPtr targetWindow, VirtualKeyCode key)
+        public void JustSendKey(IntPtr targetWindow, VirtualKeyCode key)
         {
             uint scanCode = MapVirtualKey((uint)key, 0);
             uint lParam = (0x00000001 | (scanCode << 16));

@@ -35,6 +35,7 @@ namespace DaocLauncher
                 ResponseText = preloadText;
             }
             this.DataContext = this;
+            this.Activate();
             ResponseTextBox.Focus();
             ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
         }

@@ -76,11 +76,11 @@ namespace DaocLauncher.Models
                         {
                             if (targetKey.HotKeyActionEvent != null)
                             {
+                                handled = true;
                                 targetKey.HotKeyActionEvent.Invoke(targetKey);                                
-                            }
-                            handled = true;
+                            }                            
                         }                        
-                    }
+                    }                    
                 }
             }
         }

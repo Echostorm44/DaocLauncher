@@ -240,7 +240,7 @@ namespace DaocLauncher
                             return;
                         }
                         var act = new HotKeyAction(ddlAddActionGroupName.SelectedValue.ToString(), null, null,
-                            null, txtAddActionText.Text, HotkeyActionType.SlashPrompt, nextSortID);
+                            null, txtAddActionText.Text, HotkeyActionType.SlashCommand, nextSortID);
                         TheHotKey.TriggeredActions.Add(act);
                     }
                     break;

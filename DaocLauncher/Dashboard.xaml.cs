@@ -27,7 +27,7 @@ namespace DaocLauncher
     public partial class Dashboard : UserControl, INotifyPropertyChanged
     {
         [DllImport("user32.dll")]
-        static extern IntPtr GetActiveWindow();
+        private static extern IntPtr GetForegroundWindow();
         [DllImport("user32.dll")]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
@@ -94,7 +94,6 @@ namespace DaocLauncher
                     }
                 }
             }
-
             this.DataContext = this;    
         }
 
@@ -195,6 +194,10 @@ namespace DaocLauncher
             // See if the text prompt is up so we're not listening
             if (TextPromptIsOpen == true)
             {
+                // We need to allow for hotkeys to still be used for typing.
+                IntPtr activeWindow = GetForegroundWindow();
+                var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
+                keySender.JustSendKey(activeWindow, translation);
                 return;
             }
 
@@ -222,6 +225,17 @@ namespace DaocLauncher
                             }
                             break;
                     }
+                    IntPtr activeWindow = GetForegroundWindow();
+                    //var fromMem = LoadedWindows.First();
+                    //IntPtr windowToReturnTo = GetForegroundWindow();
+                    //var activeWindowName = "";
+                    //if (LoadedWindows.ContainsValue(windowToReturnTo))
+                    //{
+                    //    activeWindowName = LoadedWindows.First(a => a.Value == windowToReturnTo).Key;
+                    //}
+                    //keySender.JustSendKey(activeWindow, VirtualKeyCode.RETURN);
+                    var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
+                    keySender.SendThoseKeysSucka(activeWindow, translation, null, activeWindow);
                 }
                 return;
             }
@@ -234,7 +248,7 @@ namespace DaocLauncher
             {
                 lock (macroLock)// Prevent things from getting too crazy
                 {
-                    IntPtr windowToReturnTo = GetActiveWindow();
+                    IntPtr windowToReturnTo = GetForegroundWindow();
                     var activeWindowName = "";
                     if (LoadedWindows.ContainsValue(windowToReturnTo))
                     {
@@ -339,13 +353,13 @@ namespace DaocLauncher
                                     TextPromptIsOpen = true;
                                     var dialog = new TextPrompt();
                                     if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
-                                    {
-                                        TextPromptIsOpen = false;
+                                    {                                        
                                         foreach (var win in LoadedWindows)
                                         {
                                             keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText, windowToReturnTo);
                                         }
                                     }
+                                    TextPromptIsOpen = false;
                                 }
                                 break;
                             case HotkeyActionType.InviteAllWindowsToGroup:
@@ -364,13 +378,13 @@ namespace DaocLauncher
                                     TextPromptIsOpen = true;
                                     var dialog = new TextPrompt();
                                     if (dialog.ShowDialog() == true && !string.IsNullOrEmpty(dialog.ResponseText))
-                                    {
-                                        TextPromptIsOpen = false;
+                                    {                                        
                                         foreach (var win in LoadedWindows)
                                         {
                                             keySender.SendChatCommand(win.Value, "/" + dialog.ResponseText, windowToReturnTo);
                                         }
                                     }
+                                    TextPromptIsOpen = false;
                                 }
                                 break;
                         }
