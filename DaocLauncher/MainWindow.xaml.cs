@@ -35,18 +35,48 @@ namespace DaocLauncher
         
         
         public MainWindow()
-        {
-            
+        {            
             InitializeComponent();
             GenSettings = GeneralHelpers.LoadGeneralSettingsFromDisk();
+            if (GenSettings.IsFirstTime)
+            {
+                MessageBox.Show("Please select the path to your game.dll file");
+                var foo = new Microsoft.Win32.OpenFileDialog() { CheckFileExists = true, Filter = "All|game.dll" };
+                var gameLocDialog = foo.ShowDialog();
+                if (gameLocDialog.HasValue)
+                {
+                    GenSettings.PathToGameDll = foo.FileName;
+                }
+                MessageBox.Show("Please select the path to a folder to store symlinks & settings");
+                var loo = new System.Windows.Forms.FolderBrowserDialog();
+                var symFolderDialog = loo.ShowDialog();
+                if (symFolderDialog == System.Windows.Forms.DialogResult.OK)
+                {
+                    GenSettings.PathToSymbolicLinks = loo.SelectedPath;
+                }
+                GenSettings.IsFirstTime = false;
+                GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
+            }
             // Make sure we've got the game path
-            while (!File.Exists(GenSettings.PathToGameDll)) 
-            { 
+            while (string.IsNullOrEmpty(GenSettings.PathToGameDll)) 
+            {
+                MessageBox.Show("Please select the path to your game.dll file");
                 var foo = new Microsoft.Win32.OpenFileDialog() { CheckFileExists = true, Filter = "All|game.dll" };
                 var gameLoc = foo.ShowDialog();
                 if (gameLoc.HasValue)
                 {
                     GenSettings.PathToGameDll = foo.FileName;
+                    GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
+                }
+            }
+            while (string.IsNullOrEmpty(GenSettings.PathToSymbolicLinks))
+            {
+                MessageBox.Show("Please select the path to a folder to store symlinks & settings");
+                var foo = new System.Windows.Forms.FolderBrowserDialog();                
+                var gameLoc = foo.ShowDialog();
+                if (gameLoc == System.Windows.Forms.DialogResult.OK)
+                {
+                    GenSettings.PathToGameDll = foo.SelectedPath;
                     GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
                 }
             }
@@ -117,6 +147,29 @@ namespace DaocLauncher
         {
             var targetUC = new Dashboard();
             mainContent.Content = targetUC;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            //var target = @"C:\Temp\SimLinkTestingArea\Linked\Test Folder 2";
+            //Directory.Delete(target, false); // This is ok, the orig folder && files inside are not harmed
+
+            //var fileTarget = @"C:\Temp\SimLinkTestingArea\Linked\TestFile.txt";
+            //File.Delete(fileTarget); // This is ok too.  Orig survives
+
+
+            //var filesToLink = Directory.GetFiles(@"C:\Temp\SimLinkTestingArea\Orig\", "*.*", SearchOption.TopDirectoryOnly);
+            //var foldersToLink = Directory.GetDirectories(@"C:\Temp\SimLinkTestingArea\Orig\", "*.*", SearchOption.TopDirectoryOnly);
+            //foreach (var item in filesToLink)
+            //{
+            //    var currentFileName = System.IO.Path.GetFileName(item);
+            //    File.CreateSymbolicLink(@"C:\Temp\SimLinkTestingArea\Linked\" + currentFileName, item);
+            //}
+            //foreach (var item in foldersToLink)
+            //{
+            //    var currentFolderName = item.Replace(@"C:\Temp\SimLinkTestingArea\Orig\", "");
+            //    Directory.CreateSymbolicLink(@"C:\Temp\SimLinkTestingArea\Linked\" + currentFolderName, item);
+            //}
         }
     }
 }

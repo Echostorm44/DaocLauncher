@@ -60,7 +60,7 @@ namespace DaocLauncher
 
             this.DataContext = this;
         }
-        
+
         private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             debouncer.Debounce(() =>
@@ -85,6 +85,19 @@ namespace DaocLauncher
                 DataGrid grid = (DataGrid)sender;
                 grid.BeginEdit(e);
             }
+        }
+
+        private void EditWindowSettings(object sender, RoutedEventArgs e)
+        {
+            var foo = gridChars.SelectedItem;
+            var mommy = Application.Current.MainWindow;
+            var point = new System.Drawing.Point((int)mommy.Left, (int)mommy.Top);
+            var p2s = PointToScreen(new Point(point.X, point.Y));
+            var scr = System.Windows.Forms.Screen.FromPoint(point);
+            var too = scr.Bounds.Contains(point) ? scr : null;
+
+
+            var moo = Window.ActualHeightProperty;
         }
     }
 }

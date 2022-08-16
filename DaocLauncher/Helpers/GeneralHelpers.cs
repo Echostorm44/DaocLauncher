@@ -172,13 +172,14 @@ namespace DaocLauncher.Helpers
         public static GeneralSettings LoadGeneralSettingsFromDisk()
         {
             string fileName = "generalsettings.dat";
-            string defaultGameDLLPath = "C:\\Program Files(x86)\\Electronic Arts\\Dark Age of Camelot\\game.dll";
-            
+            string defaultGameDLLPath = @"C:\Program Files(x86)\Electronic Arts\Dark Age of Camelot\game.dll";
+            string symbolicLinkFolderRootPath = @"c:\DaocSymbolicLinkedFolders\";
+
             var settings = GetFileContents(fileName, false);
             GeneralSettings mySettings = new GeneralSettings();
             if (string.IsNullOrEmpty(settings))
             {
-                mySettings = new GeneralSettings() { PathToGameDll = defaultGameDLLPath };
+                mySettings = new GeneralSettings() { PathToGameDll = defaultGameDLLPath, PathToSymbolicLinks = symbolicLinkFolderRootPath, IsFirstTime = true };
                 var serialGS = JsonSerializer.Serialize<GeneralSettings>(mySettings);
                 WriteFile(fileName, serialGS, false);
             }

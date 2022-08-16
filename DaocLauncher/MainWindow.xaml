@@ -31,7 +31,7 @@
                     <MenuItem Header="Manage Macros" Click="ClickedMacros"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Advanced">
-                    <MenuItem Header="TBD"></MenuItem>
+                    <MenuItem Header="TBD" Click="MenuItem_Click"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Help">
                     <MenuItem Header="View Help"></MenuItem>
