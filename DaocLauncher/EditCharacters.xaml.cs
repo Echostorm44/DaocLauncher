@@ -89,6 +89,24 @@ namespace DaocLauncher
 
         private void EditWindowSettings(object sender, RoutedEventArgs e)
         {
+            var allScreens = System.Windows.Forms.Screen.AllScreens;// use this to get names
+            var finalScreenStats = new Dictionary<string, object>();
+            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            {
+                var modes = NativeMethods.GetDeviceModes(screen.DeviceName);
+                var finalModes = (from a in modes
+                                 select new
+                                 {
+                                     a.dmPelsHeight,
+                                     a.dmPelsWidth
+                                 }).Distinct();
+                finalScreenStats.Add(screen.DeviceName, finalModes);
+            }
+
+            var gas = NativeMethods.GetGraphicsAdapters();
+            var mons = NativeMethods.GetMonitors(gas.First().DeviceName);
+            var modes2 = NativeMethods.GetDeviceModes(gas.First().DeviceName);
+
             var foo = gridChars.SelectedItem;
             var mommy = Application.Current.MainWindow;
             var point = new System.Drawing.Point((int)mommy.Left, (int)mommy.Top);
