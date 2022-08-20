@@ -1,0 +1,25 @@
+﻿<Window x:Class="DaocLauncher.WindowStatsPrompt"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DaocLauncher" Closed="Window_Closed"
+        mc:Ignorable="d" LocationChanged="Window_LocationChanged"
+        Title="Set Window Position and Size" Height="450" Width="800">
+    <StackPanel Margin="30" Orientation="Vertical">
+        <TextBlock Text="This window represents your game window." FontSize="16" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock Text="Move it to where you want the game window to open." FontSize="16" HorizontalAlignment="Center"></TextBlock>
+        <TextBlock Text="Set the resolution and full screen options you prefer." FontSize="16" HorizontalAlignment="Center"></TextBlock>
+        <ComboBox Name="ddlResolutions" Width="300" FontSize="16" Margin="20" ItemsSource="{Binding PossibleResolutions}" 
+                  SelectedItem="{Binding SelectedResolution}" SelectionChanged="ddlResolutions_SelectionChanged">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock FontSize="16" Text="{Binding Text}"></TextBlock>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <CheckBox x:Name="chkFullScreenWindowed" Content="Full Screen Windowed" HorizontalAlignment="Center" FontSize="16" IsChecked="{Binding IsFullScreenWindowed}"></CheckBox>
+        <CheckBox x:Name="chkFullScreen" Content="Full Screen" HorizontalAlignment="Center" Margin="0,10,0,20" FontSize="16" IsChecked="{Binding IsFullScreen}"></CheckBox>
+        <Button x:Name="btnOK" Content="Done" Click="btnOK_Click" FontSize="16" Width="150"></Button>
+    </StackPanel>
+</Window>

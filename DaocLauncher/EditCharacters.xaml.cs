@@ -34,26 +34,26 @@ namespace DaocLauncher
             InitializeComponent();
             var classList = GeneralHelpers.GetAllCharacterClasses();
             CharacterClasses = new ObservableCollection<string>();
-            foreach (var item in classList)
+            foreach(var item in classList)
             {
                 CharacterClasses.Add(item.Key);
             }
 
             var characterList = GeneralHelpers.LoadCharactersFromDisk();
             AllCharacters = new ObservableCollection<DaocCharacter>();
-            foreach (var item in characterList)
+            foreach(var item in characterList)
             {
                 AllCharacters.Add(item);
             }
             var serverList = GeneralHelpers.LoadServerListFromDisk();
             Servers = new ObservableCollection<string>();
-            foreach (var item in serverList.Servers)
+            foreach(var item in serverList.Servers)
             {
                 Servers.Add(item.Name);
             }
             var accountList = GeneralHelpers.LoadAccountListFromDisk();
             AccountNames = new ObservableCollection<string>();
-            foreach (var item in accountList.MyAccounts)
+            foreach(var item in accountList.MyAccounts)
             {
                 AccountNames.Add(item.Name ?? "NA");
             }
@@ -71,7 +71,7 @@ namespace DaocLauncher
 
         private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (gridChars.SelectedItem != null)
+            if(gridChars.SelectedItem != null)
             {
                 AllCharacters.Remove((DaocCharacter)gridChars.SelectedItem);
                 GeneralHelpers.SaveCharactersToDisk(AllCharacters.ToList());
@@ -80,7 +80,7 @@ namespace DaocLauncher
 
         private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource.GetType() == typeof(DataGridCell))
+            if(e.OriginalSource.GetType() == typeof(DataGridCell))
             {
                 DataGrid grid = (DataGrid)sender;
                 grid.BeginEdit(e);
@@ -89,33 +89,20 @@ namespace DaocLauncher
 
         private void EditWindowSettings(object sender, RoutedEventArgs e)
         {
-            var allScreens = System.Windows.Forms.Screen.AllScreens;// use this to get names
-            var finalScreenStats = new Dictionary<string, object>();
-            foreach (System.Windows.Forms.Screen screen in System.Windows.Forms.Screen.AllScreens)
+            if(gridChars.SelectedItem != null)
             {
-                var modes = NativeMethods.GetDeviceModes(screen.DeviceName);
-                var finalModes = (from a in modes
-                                 select new
-                                 {
-                                     a.dmPelsHeight,
-                                     a.dmPelsWidth
-                                 }).Distinct();
-                finalScreenStats.Add(screen.DeviceName, finalModes);
+                var targetCharacter = (DaocCharacter)gridChars.SelectedItem;
+                WindowStatsPrompt ws = new WindowStatsPrompt(targetCharacter);
+                ws.ShowDialog();
+
+                targetCharacter.WindowFullScreen = ws.IsFullScreen;
+                targetCharacter.WindowFullScreenWindowed = ws.IsFullScreenWindowed;
+                targetCharacter.WindowX = ws.ResponseX;
+                targetCharacter.WindowY = ws.ResponseY;
+                targetCharacter.WindowHeight = ws.ResponseHeight;
+                targetCharacter.WindowWidth = ws.ResponseWidth;
+                GeneralHelpers.SaveCharactersToDisk(AllCharacters.ToList());
             }
-
-            var gas = NativeMethods.GetGraphicsAdapters();
-            var mons = NativeMethods.GetMonitors(gas.First().DeviceName);
-            var modes2 = NativeMethods.GetDeviceModes(gas.First().DeviceName);
-
-            var foo = gridChars.SelectedItem;
-            var mommy = Application.Current.MainWindow;
-            var point = new System.Drawing.Point((int)mommy.Left, (int)mommy.Top);
-            var p2s = PointToScreen(new Point(point.X, point.Y));
-            var scr = System.Windows.Forms.Screen.FromPoint(point);
-            var too = scr.Bounds.Contains(point) ? scr : null;
-
-
-            var moo = Window.ActualHeightProperty;
         }
     }
 }
