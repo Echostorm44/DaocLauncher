@@ -32,51 +32,70 @@ namespace DaocLauncher
     public partial class MainWindow : Window
     {
         public static GeneralSettings? GenSettings { get; set; }
-        
-        
+
+
         public MainWindow()
-        {            
+        {
             InitializeComponent();
             GenSettings = GeneralHelpers.LoadGeneralSettingsFromDisk();
-            if (GenSettings.IsFirstTime)
+            if(GenSettings.IsFirstTime)
             {
                 MessageBox.Show("Please select the path to your game.dll file");
                 var foo = new Microsoft.Win32.OpenFileDialog() { CheckFileExists = true, Filter = "All|game.dll" };
                 var gameLocDialog = foo.ShowDialog();
-                if (gameLocDialog.HasValue)
+                if(gameLocDialog.HasValue)
                 {
                     GenSettings.PathToGameDll = foo.FileName;
                 }
                 MessageBox.Show("Please select the path to a folder to store symlinks & settings");
                 var loo = new System.Windows.Forms.FolderBrowserDialog();
                 var symFolderDialog = loo.ShowDialog();
-                if (symFolderDialog == System.Windows.Forms.DialogResult.OK)
+                if(symFolderDialog == System.Windows.Forms.DialogResult.OK)
                 {
                     GenSettings.PathToSymbolicLinks = loo.SelectedPath;
                 }
+                MessageBox.Show(@"Please select the path to your DAOC user Settings.  It should be something like:\r\nc:\Users\username\AppData\Roaming\Electronic Arts\Dark Age Of Camelot\LotM");
+                var goo = new System.Windows.Forms.FolderBrowserDialog();
+                var userFolderDialog = goo.ShowDialog();
+                if(userFolderDialog == System.Windows.Forms.DialogResult.OK)
+                {
+                    GenSettings.PathToUserSettings = goo.SelectedPath;
+                }
+
                 GenSettings.IsFirstTime = false;
                 GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
             }
             // Make sure we've got the game path
-            while (string.IsNullOrEmpty(GenSettings.PathToGameDll)) 
+            while(string.IsNullOrEmpty(GenSettings.PathToGameDll))
             {
                 MessageBox.Show("Please select the path to your game.dll file");
                 var foo = new Microsoft.Win32.OpenFileDialog() { CheckFileExists = true, Filter = "All|game.dll" };
                 var gameLoc = foo.ShowDialog();
-                if (gameLoc.HasValue)
+                if(gameLoc.HasValue)
                 {
                     GenSettings.PathToGameDll = foo.FileName;
                     GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
                 }
             }
-            while (string.IsNullOrEmpty(GenSettings.PathToSymbolicLinks))
+            while(string.IsNullOrEmpty(GenSettings.PathToSymbolicLinks))
             {
                 MessageBox.Show("Please select the path to a folder to store symlinks & settings");
-                var foo = new System.Windows.Forms.FolderBrowserDialog();                
+                var foo = new System.Windows.Forms.FolderBrowserDialog();
                 var gameLoc = foo.ShowDialog();
-                if (gameLoc == System.Windows.Forms.DialogResult.OK)
+                if(gameLoc == System.Windows.Forms.DialogResult.OK)
                 {
                     GenSettings.PathToGameDll = foo.SelectedPath;
+                    GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
+                }
+            }
+            while(string.IsNullOrEmpty(GenSettings.PathToUserSettings))
+            {
+                MessageBox.Show(@"Please select the path to your DAOC user Settings.  It should be something like:\r\nc:\Users\username\AppData\Roaming\Electronic Arts\Dark Age Of Camelot\LotM");
+                var goo = new System.Windows.Forms.FolderBrowserDialog();
+                var userFolderDialog = goo.ShowDialog();
+                if(userFolderDialog == System.Windows.Forms.DialogResult.OK)
+                {
+                    GenSettings.PathToUserSettings = goo.SelectedPath;
                     GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
                 }
             }
@@ -107,6 +126,7 @@ namespace DaocLauncher
         }
 
         HotKey hotKey;
+
         private void ClickedAbout(object sender, RoutedEventArgs e)
         {
             KeyPrompt keyPrompt = new KeyPrompt();
@@ -114,6 +134,7 @@ namespace DaocLauncher
             //hotKey = new HotKey(Key.F9, KeyModifier.None, "test");
             //hotKey.Register(OnHotKeyHandler);
         }
+
         [DllImport("user32.dll")]
         static extern IntPtr GetActiveWindow();
 
@@ -127,7 +148,7 @@ namespace DaocLauncher
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             SendKeysTo keySender = new SendKeysTo();
             var dialog = new TextPrompt();
-            if (dialog.ShowDialog() == true)
+            if(dialog.ShowDialog() == true)
             {
                 keySender.SendChatCommand(WindowToFind, dialog.ResponseText, WindowToReturnTo);
             }

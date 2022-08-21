@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,10 +20,13 @@ namespace DaocLauncher.Helpers
     {
         [DllImport("user32.dll")]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
         [DllImport("user32.dll")]
         public static extern bool SetWindowText(IntPtr hWnd, string lpString);
+
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int GetWindowTextLength(IntPtr hWnd);
 
@@ -56,7 +60,7 @@ namespace DaocLauncher.Helpers
             var myMacros = new List<MacroSet>();
 
             var rawMacros = GetFileContents(fileName, false);
-            if (string.IsNullOrEmpty(rawMacros))
+            if(string.IsNullOrEmpty(rawMacros))
             {
                 var serial = JsonSerializer.Serialize<List<MacroSet>>(myMacros);
                 WriteFile(fileName, serial, true);
@@ -68,14 +72,14 @@ namespace DaocLauncher.Helpers
             }
             return myMacros;
         }
+
         public static void SaveMacrosToDisk(List<MacroSet> macros)
         {
             var macrosToSave = macros.Where(a => !string.IsNullOrEmpty(a.Name)).ToList();
-            foreach (var set in macrosToSave)
+            foreach(var set in macrosToSave)
             {
-                foreach (var hotKey in set.HotKeyCollection)
+                foreach(var hotKey in set.HotKeyCollection)
                 {
-
                     var temp = hotKey.TriggeredActions.Select(a => (HotKeyAction)a.Clone()).ToList();// If you don't do a clone here you'll just kill them by ref when clearing on next line
                     hotKey.TriggeredActions.Clear();
                     temp.OrderBy(a => a.SortOrderID).ToList().ForEach(a => 
@@ -91,19 +95,26 @@ namespace DaocLauncher.Helpers
         public static List<DaocCharacter> LoadCharactersFromDisk()
         {
             string fileName = "characters.dat";
-            var myAccounts = new List<DaocCharacter>();
+            var myCharacters = new List<DaocCharacter>();
 
             var rawCharacters = GetFileContents(fileName, true);
-            if (string.IsNullOrEmpty(rawCharacters))
+            if(string.IsNullOrEmpty(rawCharacters))
             {
-                var serial = JsonSerializer.Serialize<List<DaocCharacter>>(myAccounts);
+                var serial = JsonSerializer.Serialize<List<DaocCharacter>>(myCharacters);
                 WriteFile(fileName, serial, true);
             }
             else
             {
-                myAccounts = JsonSerializer.Deserialize<List<DaocCharacter>>(rawCharacters) ?? new List<DaocCharacter>() { };
+                myCharacters = JsonSerializer.Deserialize<List<DaocCharacter>>(rawCharacters) ?? new List<DaocCharacter>() { };
             }
-            return myAccounts;
+            return myCharacters;
+        }
+
+        public static DaocCharacter? LoadCharacterFromDisk(string name)
+        {
+            var allCharacters = LoadCharactersFromDisk();
+            var targetCharacter = allCharacters.SingleOrDefault(a => a.Name == name);
+            return targetCharacter;
         }
 
         public static Dictionary<string, string> GetAllCharacterClasses()
@@ -163,7 +174,7 @@ namespace DaocLauncher.Helpers
         {
             var charsToSave = characters.Where(a => !string.IsNullOrEmpty(a.Name) && !string.IsNullOrEmpty(a.Server) &&
                 !string.IsNullOrEmpty(a.ParentAccountName) && !string.IsNullOrEmpty(a.Class)).ToList();
-            
+
             string fileName = "characters.dat";
             var serialA = JsonSerializer.Serialize<List<DaocCharacter>>(charsToSave);
             WriteFile(fileName, serialA, true);
@@ -177,7 +188,7 @@ namespace DaocLauncher.Helpers
 
             var settings = GetFileContents(fileName, false);
             GeneralSettings mySettings = new GeneralSettings();
-            if (string.IsNullOrEmpty(settings))
+            if(string.IsNullOrEmpty(settings))
             {
                 mySettings = new GeneralSettings() { PathToGameDll = defaultGameDLLPath, PathToSymbolicLinks = symbolicLinkFolderRootPath, IsFirstTime = true };
                 var serialGS = JsonSerializer.Serialize<GeneralSettings>(mySettings);
@@ -202,7 +213,7 @@ namespace DaocLauncher.Helpers
             string fileName = "macroCategories.ini";
             var rawCategories = GetFileContents(fileName, false);
             List<string> result = new List<string>();
-            if (string.IsNullOrEmpty(rawCategories))
+            if(string.IsNullOrEmpty(rawCategories))
             {
                 result.Add("PBAOE");
                 result.Add("Melee");
@@ -216,7 +227,7 @@ namespace DaocLauncher.Helpers
             else
             {
                 result = JsonSerializer.Deserialize<List<string>>(rawCategories) ?? new List<string>();
-                if (result.Count == 0)
+                if(result.Count == 0)
                 {
                     result.Add("PBAOE");
                     result.Add("Melee");
@@ -241,7 +252,7 @@ namespace DaocLauncher.Helpers
             string fileName = "serverList.ini";
             var rawServers = GetFileContents(fileName, false);
             ServerList servers = new ServerList();
-            if (string.IsNullOrEmpty(rawServers))
+            if(string.IsNullOrEmpty(rawServers))
             {
                 servers = new ServerList() { Servers = new List<Server>() };
                 servers.Servers.Add(new Server() { ID = "41", IP = "107.23.173.143", IsOfficial = true, Name = "Ywain1" });
@@ -264,15 +275,16 @@ namespace DaocLauncher.Helpers
             }
             return servers;
         }
+
         public static AllDaocAccounts LoadAccountListFromDisk()
         {
             string fileName = "accountList.ini";
             var rawAccounts = GetFileContents(fileName, true);
             AllDaocAccounts accounts = new AllDaocAccounts();
-            if (string.IsNullOrEmpty(rawAccounts))
+            if(string.IsNullOrEmpty(rawAccounts))
             {
                 accounts = new AllDaocAccounts() { MyAccounts = new List<DaocAccount>() };
-                accounts.MyAccounts.Add(new DaocAccount() { Name = "SampleName", Password= "SamplePW", DefaultTag = "" });
+                accounts.MyAccounts.Add(new DaocAccount() { Name = "SampleName", Password = "SamplePW", DefaultTag = "" });
                 var serialA = JsonSerializer.Serialize<AllDaocAccounts>(accounts);
                 WriteFile(fileName, serialA, true);
             }
@@ -296,14 +308,14 @@ namespace DaocLauncher.Helpers
         static string GetFileContents(string fileName, bool isEncrypted)
         {
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DaocLauncher\\";
-            if (!File.Exists(basePath + fileName))
+            if(!File.Exists(basePath + fileName))
             {
                 return "";
             }
             else
             {
                 var fileText = File.ReadAllText(basePath + fileName);
-                if (isEncrypted)
+                if(isEncrypted)
                 {
                     fileText = fileText.Decrypt();
                 }
@@ -314,11 +326,11 @@ namespace DaocLauncher.Helpers
         static void WriteFile(string filename, string contents, bool isEncrypted)
         {
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DaocLauncher\\";
-            if (!Directory.Exists(basePath))
+            if(!Directory.Exists(basePath))
             {
                 Directory.CreateDirectory(basePath);
             }
-            if (isEncrypted)
+            if(isEncrypted)
             {
                 contents = contents.Encrypt();
             }
@@ -338,11 +350,93 @@ namespace DaocLauncher.Helpers
         /// <param name="realmNumber">1 Alb; 2 Mid; 3 Hib</param>
         public static IntPtr LaunchDaoc(string windowTitle, string userName, string password, string serverIP, string serverID, string characterName, string realmNumber)
         {
-            string gameFolder = LoadGeneralSettingsFromDisk().PathToGameDll.Replace("game.dll", "");
+            var genSettings = LoadGeneralSettingsFromDisk();
+            string gameFolder = genSettings.PathToGameDll.Replace("game.dll", "");
+            DaocCharacter? targetCharacter = null;
+            if(!string.IsNullOrEmpty(characterName))
+            {// If we are launching a character we can see if we have window settings && a symlink folder to launch from
+                targetCharacter = LoadCharacterFromDisk(characterName);
+                #region SymLink Window Settings Trickery
+                if(targetCharacter != null && targetCharacter.WindowHeight > 0 && targetCharacter.WindowWidth > 0)
+                {
+                    var charSymLinkFolder = $@"{genSettings.PathToSymbolicLinks}\{characterName}\";
+                    if(!Directory.Exists(charSymLinkFolder))
+                    {
+                        Directory.CreateDirectory(charSymLinkFolder);
+                    }
+                    if(Directory.EnumerateFiles(charSymLinkFolder).Count() == 0)
+                    {// Folder isn't initialized yet, lets do that now.
+                        var filesToLink = Directory.GetFiles(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
+                        var foldersToLink = Directory.GetDirectories(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
+                        foreach(var item in filesToLink)
+                        {
+                            var currentFileName = System.IO.Path.GetFileName(item);
+                            File.CreateSymbolicLink(charSymLinkFolder + currentFileName, item);
+                        }
+                        foreach(var item in foldersToLink)
+                        {
+                            var currentFolderName = item.Replace(@"C:\Temp\SimLinkTestingArea\Orig\", "");
+                            Directory.CreateSymbolicLink(charSymLinkFolder + currentFolderName, item);
+                        }
+                        // Ok, the Symlinks are ready, we just need to add a Paths file && a new folder to hold out user.dat && other stuff like char inis && edit the user.dat with our resolutionsettings
+                        var characterUserSettingsFolder = $@"{{charSymLinkFolder}}copiedUserSettings\";
+                        if(!Directory.Exists(characterUserSettingsFolder))
+                        {
+                            Directory.CreateDirectory(characterUserSettingsFolder);
+                        }
+                        var userFiles = Directory.GetFiles(genSettings.PathToUserSettings);
+                        foreach(var item in userFiles)
+                        {
+                            var currentFileName = System.IO.Path.GetFileName(item);
+                            if(currentFileName == "user.dat")
+                            {
+                                File.Copy(item, characterUserSettingsFolder + "oldUser.dat.old", true);
+                            }
+                            File.Copy(item, characterUserSettingsFolder + currentFileName, true);
+                        }
+                        // change user.dat filename then iterate through old user.dat writing lines && occasionally changing a value for resolution && windowed writing to a new user.dat
+                        using(TextReader tr = new StreamReader(characterUserSettingsFolder + "oldUser.dat.old"))
+                        {
+                            using(TextWriter tw = new StreamWriter(characterUserSettingsFolder + "user.dat", false))
+                            {
+                                while(tr.Peek() > 0)
+                                {
+                                    var currentLine = tr.ReadLine() ?? "";
+                                    if(currentLine.StartsWith("windowed="))
+                                    {
+                                        currentLine = "windowed=" + (targetCharacter.WindowFullScreen ? "0" : "1");
+                                    }
+                                    if(currentLine.StartsWith("screen_height="))
+                                    {
+                                        currentLine = "screen_height=" + targetCharacter.WindowHeight;
+                                    }
+                                    if(currentLine.StartsWith("screen_width="))
+                                    {
+                                        currentLine = "screen_width=" + targetCharacter.WindowWidth;
+                                    }
+                                    if(currentLine.StartsWith("fullscreen_windowed="))
+                                    {
+                                        currentLine = "fullscreen_windowed=" + (targetCharacter.WindowFullScreenWindowed ? "1" : "0");
+                                    }
+                                    tw.WriteLine(currentLine);
+                                }
+                            }
+                        }
+                        using(TextWriter tw = new StreamWriter(charSymLinkFolder + "paths.dat", false))
+                        {
+                            tw.WriteLine("[paths]");
+                            tw.WriteLine($@"settings={characterUserSettingsFolder}");
+                        }
+                    }
+                    gameFolder = charSymLinkFolder;
+                }
+                #endregion                
+            }
+
             IntPtr windowHandle = IntPtr.Zero;
             try
             {
-                using (Process process = new Process())
+                using(Process process = new Process())
                 {
                     process.StartInfo.FileName = "cmd.exe";
                     process.StartInfo.WorkingDirectory = gameFolder;
@@ -354,15 +448,15 @@ namespace DaocLauncher.Helpers
                     Thread.Sleep(500);
                     windowHandle = FindWindow("DAoCMWC", "Dark Age of Camelot © 2001-2021 Electronic Arts Inc. All Rights Reserved.");
                     SpinWait.SpinUntil(() => windowHandle != IntPtr.Zero);
-                    SetWindowText(windowHandle, windowTitle);                    
+                    SetWindowText(windowHandle, windowTitle);
                 }
                 // We look for the mutant handles that prevents more than 2 instances and kill them
                 MutantHunter hunt = new MutantHunter();
                 var results = hunt.KillMutants();
+                // PICKUP.  user targetCharacter x Y to move window to correct position
             }
-            catch (Exception)
-            {  
-                
+            catch(Exception)
+            {
             }
             return windowHandle;
         }
@@ -374,8 +468,7 @@ namespace DaocLauncher.Helpers
             GetWindowText(windowHandle, sb, sb.Capacity);
             return sb.ToString();
         }
-
-        #region TODO
+    #region TODO
         //public static void UpdateTaskBarProgress(object sender, double value)
         //{
         //    var foo = ((MainWindow)System.Windows.Window.GetWindow((System.Windows.Controls.UserControl)sender));
@@ -391,6 +484,5 @@ namespace DaocLauncher.Helpers
         //    foo.TaskbarItemInfo.ProgressValue = value;
         //}
         #endregion
-
     }
 }
