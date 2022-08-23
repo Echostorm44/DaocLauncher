@@ -53,9 +53,12 @@ public partial class WindowStatsPrompt : Window, INotifyPropertyChanged
             {
                 return;
             }
-
             isFullScreen = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFullScreen)));
+            if(IsFullScreenWindowed)
+            {
+                IsFullScreen = true;
+            }
         }
     }
     bool isFullScreenWindowed;
@@ -71,6 +74,10 @@ public partial class WindowStatsPrompt : Window, INotifyPropertyChanged
 
             isFullScreenWindowed = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFullScreenWindowed)));
+            if(IsFullScreenWindowed)
+            {
+                IsFullScreen = true;
+            }
         }
     }
 
@@ -108,6 +115,11 @@ public partial class WindowStatsPrompt : Window, INotifyPropertyChanged
             this.Top = characterIn.WindowY;
         }
         LoadResolutionDropdown();
+        var saveResolution = PossibleResolutions.SingleOrDefault(a => a.Width == characterIn.WindowWidth && a.Height == characterIn.WindowHeight);
+        if(saveResolution != null)
+        {
+            SelectedResolution = saveResolution;
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

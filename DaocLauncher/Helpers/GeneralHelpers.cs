@@ -30,6 +30,12 @@ namespace DaocLauncher.Helpers
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int GetWindowTextLength(IntPtr hWnd);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        const uint SWP_NOSIZE = 0x0001;
+        const uint SWP_NOZORDER = 0x0004;
+
         public enum ConfigFileType
         {
             GeneralSettings,
@@ -356,81 +362,11 @@ namespace DaocLauncher.Helpers
             if(!string.IsNullOrEmpty(characterName))
             {// If we are launching a character we can see if we have window settings && a symlink folder to launch from
                 targetCharacter = LoadCharacterFromDisk(characterName);
-                #region SymLink Window Settings Trickery
                 if(targetCharacter != null && targetCharacter.WindowHeight > 0 && targetCharacter.WindowWidth > 0)
                 {
-                    var charSymLinkFolder = $@"{genSettings.PathToSymbolicLinks}\{characterName}\";
-                    if(!Directory.Exists(charSymLinkFolder))
-                    {
-                        Directory.CreateDirectory(charSymLinkFolder);
-                    }
-                    if(Directory.EnumerateFiles(charSymLinkFolder).Count() == 0)
-                    {// Folder isn't initialized yet, lets do that now.
-                        var filesToLink = Directory.GetFiles(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
-                        var foldersToLink = Directory.GetDirectories(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
-                        foreach(var item in filesToLink)
-                        {
-                            var currentFileName = System.IO.Path.GetFileName(item);
-                            File.CreateSymbolicLink(charSymLinkFolder + currentFileName, item);
-                        }
-                        foreach(var item in foldersToLink)
-                        {
-                            var currentFolderName = item.Replace(@"C:\Temp\SimLinkTestingArea\Orig\", "");
-                            Directory.CreateSymbolicLink(charSymLinkFolder + currentFolderName, item);
-                        }
-                        // Ok, the Symlinks are ready, we just need to add a Paths file && a new folder to hold out user.dat && other stuff like char inis && edit the user.dat with our resolutionsettings
-                        var characterUserSettingsFolder = $@"{{charSymLinkFolder}}copiedUserSettings\";
-                        if(!Directory.Exists(characterUserSettingsFolder))
-                        {
-                            Directory.CreateDirectory(characterUserSettingsFolder);
-                        }
-                        var userFiles = Directory.GetFiles(genSettings.PathToUserSettings);
-                        foreach(var item in userFiles)
-                        {
-                            var currentFileName = System.IO.Path.GetFileName(item);
-                            if(currentFileName == "user.dat")
-                            {
-                                File.Copy(item, characterUserSettingsFolder + "oldUser.dat.old", true);
-                            }
-                            File.Copy(item, characterUserSettingsFolder + currentFileName, true);
-                        }
-                        // change user.dat filename then iterate through old user.dat writing lines && occasionally changing a value for resolution && windowed writing to a new user.dat
-                        using(TextReader tr = new StreamReader(characterUserSettingsFolder + "oldUser.dat.old"))
-                        {
-                            using(TextWriter tw = new StreamWriter(characterUserSettingsFolder + "user.dat", false))
-                            {
-                                while(tr.Peek() > 0)
-                                {
-                                    var currentLine = tr.ReadLine() ?? "";
-                                    if(currentLine.StartsWith("windowed="))
-                                    {
-                                        currentLine = "windowed=" + (targetCharacter.WindowFullScreen ? "0" : "1");
-                                    }
-                                    if(currentLine.StartsWith("screen_height="))
-                                    {
-                                        currentLine = "screen_height=" + targetCharacter.WindowHeight;
-                                    }
-                                    if(currentLine.StartsWith("screen_width="))
-                                    {
-                                        currentLine = "screen_width=" + targetCharacter.WindowWidth;
-                                    }
-                                    if(currentLine.StartsWith("fullscreen_windowed="))
-                                    {
-                                        currentLine = "fullscreen_windowed=" + (targetCharacter.WindowFullScreenWindowed ? "1" : "0");
-                                    }
-                                    tw.WriteLine(currentLine);
-                                }
-                            }
-                        }
-                        using(TextWriter tw = new StreamWriter(charSymLinkFolder + "paths.dat", false))
-                        {
-                            tw.WriteLine("[paths]");
-                            tw.WriteLine($@"settings={characterUserSettingsFolder}");
-                        }
-                    }
+                    var charSymLinkFolder = $@"{genSettings.PathToSymbolicLinks}\{targetCharacter.Name}\";
                     gameFolder = charSymLinkFolder;
                 }
-                #endregion                
             }
 
             IntPtr windowHandle = IntPtr.Zero;
@@ -453,7 +389,10 @@ namespace DaocLauncher.Helpers
                 // We look for the mutant handles that prevents more than 2 instances and kill them
                 MutantHunter hunt = new MutantHunter();
                 var results = hunt.KillMutants();
-                // PICKUP.  user targetCharacter x Y to move window to correct position
+                if(targetCharacter != null && !targetCharacter.WindowFullScreen && !targetCharacter.WindowFullScreenWindowed)
+                {
+                    SetWindowPos(windowHandle, IntPtr.Zero, targetCharacter.WindowX, targetCharacter.WindowY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+                }
             }
             catch(Exception)
             {

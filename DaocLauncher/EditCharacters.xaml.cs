@@ -3,7 +3,9 @@ using DaocLauncher.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -94,7 +96,6 @@ namespace DaocLauncher
                 var targetCharacter = (DaocCharacter)gridChars.SelectedItem;
                 WindowStatsPrompt ws = new WindowStatsPrompt(targetCharacter);
                 ws.ShowDialog();
-
                 targetCharacter.WindowFullScreen = ws.IsFullScreen;
                 targetCharacter.WindowFullScreenWindowed = ws.IsFullScreenWindowed;
                 targetCharacter.WindowX = ws.ResponseX;
@@ -102,6 +103,102 @@ namespace DaocLauncher
                 targetCharacter.WindowHeight = ws.ResponseHeight;
                 targetCharacter.WindowWidth = ws.ResponseWidth;
                 GeneralHelpers.SaveCharactersToDisk(AllCharacters.ToList());
+
+                var genSettings = GeneralHelpers.LoadGeneralSettingsFromDisk();
+                string gameFolder = genSettings.PathToGameDll.Replace("game.dll", "");
+                var charSymLinkFolder = $@"{genSettings.PathToSymbolicLinks}\{targetCharacter.Name}\";
+                var characterUserSettingsFolder = $@"{charSymLinkFolder}\copiedUserSettings\";
+
+                if(!Directory.Exists(charSymLinkFolder))
+                {
+                    Directory.CreateDirectory(charSymLinkFolder);
+                }
+                if(Directory.EnumerateFiles(charSymLinkFolder).Count() == 0)
+                {// Folder isn't initialized yet, lets do that now.
+                    var filesToLink = Directory.GetFiles(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
+                    var foldersToLink = Directory.GetDirectories(gameFolder, "*.*", SearchOption.TopDirectoryOnly);
+                    foreach(var item in filesToLink)
+                    {
+                        var currentFileName = System.IO.Path.GetFileName(item);
+                        File.CreateSymbolicLink(charSymLinkFolder + currentFileName, item);
+                    }
+                    foreach(var item in foldersToLink)
+                    {
+                        var currentFolderName = item.Replace(gameFolder, "");
+                        Directory.CreateSymbolicLink(charSymLinkFolder + currentFolderName, item);
+                    }
+                    // Ok, the Symlinks are ready, we just need to add a Paths file && a new folder to hold out user.dat && other stuff like char inis && edit the user.dat with our resolutionsettings                    
+                    if(!Directory.Exists(characterUserSettingsFolder))
+                    {
+                        Directory.CreateDirectory(characterUserSettingsFolder);
+                    }
+                    var userFiles = Directory.GetFiles(genSettings.PathToUserSettings);
+                    foreach(var item in userFiles)
+                    {
+                        var currentFileName = System.IO.Path.GetFileName(item);
+                        if(currentFileName == "user.dat")
+                        {
+                            File.Copy(item, characterUserSettingsFolder + "oldUser.dat.old", true);
+                        }
+                        File.Copy(item, characterUserSettingsFolder + currentFileName, true);
+                    }
+                    // change user.dat filename then iterate through old user.dat writing lines && occasionally changing a value for resolution && windowed writing to a new user.dat
+                    UpdateUserDat(targetCharacter, characterUserSettingsFolder);
+                    using(TextWriter tw = new StreamWriter(charSymLinkFolder + "paths.dat", false))
+                    {
+                        tw.WriteLine("[paths]");
+                        tw.WriteLine($@"settings={characterUserSettingsFolder}");
+                    }
+                }
+                else
+                {
+                    File.Copy(characterUserSettingsFolder + "user.dat", characterUserSettingsFolder + "oldUser.dat.old", true);
+                    UpdateUserDat(targetCharacter, characterUserSettingsFolder);
+                }
+            }
+        }
+
+        private static void UpdateUserDat(DaocCharacter targetCharacter, string characterUserSettingsFolder)
+        {
+            using(TextReader tr = new StreamReader(characterUserSettingsFolder + "oldUser.dat.old"))
+            {
+                using(TextWriter tw = new StreamWriter(characterUserSettingsFolder + "user.dat", false))
+                {
+                    bool inPerformaceSection = false;
+                    while(tr.Peek() > 0)
+                    {
+                        var currentLine = tr.ReadLine() ?? "";
+                        if(currentLine.StartsWith("windowed="))
+                        {
+                            currentLine = "windowed=" + (targetCharacter.WindowFullScreen ? "0" : "1");
+                        }
+                        if(currentLine.StartsWith("screen_height="))
+                        {
+                            currentLine = "screen_height=" + targetCharacter.WindowHeight;
+                        }
+                        if(currentLine.StartsWith("screen_width="))
+                        {
+                            currentLine = "screen_width=" + targetCharacter.WindowWidth;
+                        }
+                        if(currentLine.StartsWith("fullscreen_windowed="))
+                        {
+                            currentLine = "fullscreen_windowed=" + (targetCharacter.WindowFullScreenWindowed ? "1" : "0");
+                        }
+                        if(currentLine.StartsWith("[performance]"))
+                        {
+                            inPerformaceSection = true;
+                        }
+                        if(inPerformaceSection && currentLine.StartsWith("item10="))
+                        {// This is where full screen window sets the monitor on my system at least.  0 is monitor 1, 1 is monitor 2, will need more testing
+                            currentLine = "item10=0";
+                        }
+                        if(currentLine.StartsWith("["))
+                        {
+                            inPerformaceSection = false;
+                        }
+                        tw.WriteLine(currentLine);
+                    }
+                }
             }
         }
     }
