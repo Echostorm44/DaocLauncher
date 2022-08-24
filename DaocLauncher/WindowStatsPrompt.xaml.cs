@@ -140,6 +140,8 @@ public partial class WindowStatsPrompt : Window, INotifyPropertyChanged
     private void SetReturnAndClose()
     {
         var point = new System.Drawing.Point((int)this.Left, (int)this.Top);
+        var scr = System.Windows.Forms.Screen.FromPoint(point);
+        CurrentScreenName = scr.DeviceName;
         ResponseHeight = (int)this.ActualHeight;
         ResponseWidth = (int)this.ActualWidth;
         ResponseX = point.X;

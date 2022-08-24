@@ -18,6 +18,7 @@ namespace DaocLauncher.Models
         public int WindowHeight { get; set; }
         public bool WindowFullScreen { get; set; }
         public bool WindowFullScreenWindowed { get; set; }
+        public int MonitorNumber { get; set; }
 
         public DaocCharacter()
         {

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -102,6 +103,20 @@ namespace DaocLauncher
                 targetCharacter.WindowY = ws.ResponseY;
                 targetCharacter.WindowHeight = ws.ResponseHeight;
                 targetCharacter.WindowWidth = ws.ResponseWidth;
+                if(ws.CurrentScreenName.Contains("DISPLAY"))
+                {
+                    Regex regNum = new Regex(".?DISPLAY([0-9]+)");
+                    var regResult = regNum.Match(ws.CurrentScreenName);
+                    if(regResult.Success && regResult.Groups.Count > 1)
+                    {
+                        var monitorNumTemp = regResult.Groups[1].Value;
+                        if(int.TryParse(monitorNumTemp, out var monitorNum))
+                        {
+                            targetCharacter.MonitorNumber = (monitorNum - 1);// These seem to start from 1 but DAOC is zero based
+                        }
+                    }
+                }
+
                 GeneralHelpers.SaveCharactersToDisk(AllCharacters.ToList());
 
                 var genSettings = GeneralHelpers.LoadGeneralSettingsFromDisk();
@@ -190,7 +205,7 @@ namespace DaocLauncher
                         }
                         if(inPerformaceSection && currentLine.StartsWith("item10="))
                         {// This is where full screen window sets the monitor on my system at least.  0 is monitor 1, 1 is monitor 2, will need more testing
-                            currentLine = "item10=0";
+                            currentLine = "item10=" + targetCharacter.MonitorNumber;
                         }
                         if(currentLine.StartsWith("["))
                         {

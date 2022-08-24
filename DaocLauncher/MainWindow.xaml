@@ -20,21 +20,21 @@
                 <MenuItem Header="File">
                     <MenuItem Header="Home Dashboard" Click="ClickedHome"></MenuItem>
                     <MenuItem Header="Settings"></MenuItem>
-                    <MenuItem Header="Quit"></MenuItem>
+                    <MenuItem Header="Quit" Click="ClickedQuit"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Edit">
                     <MenuItem Header="Manage Accounts" Click="ClickedEditAccounts"></MenuItem>
                     <MenuItem Header="Manage Characters" Click="ClickedEditCharacters"></MenuItem>
-                    <MenuItem Header="Manage Teams"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Macros">
                     <MenuItem Header="Manage Macros" Click="ClickedMacros"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Advanced">
-                    <MenuItem Header="TBD" Click="MenuItem_Click"></MenuItem>
+                    <MenuItem Header="Import Characters" Click="ClickedImportToons"></MenuItem>
                 </MenuItem>
                 <MenuItem Header="Help">
-                    <MenuItem Header="View Help"></MenuItem>
+                    <MenuItem Header="View Help" Click="ClickedViewHelp"></MenuItem>
+                    <MenuItem Header="Source Code on Github" Click="ClickedViewGithub"></MenuItem>
                     <MenuItem Header="About" Click="ClickedAbout"></MenuItem>
                 </MenuItem>
             </Menu>
