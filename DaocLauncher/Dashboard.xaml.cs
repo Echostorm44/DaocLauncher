@@ -399,5 +399,11 @@ namespace DaocLauncher
         private void ddlMacroSets_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
+
+        ~Dashboard()
+        {
+            var hitit = 1;
+            MacroSets.Clear();
+        }
     }
 }

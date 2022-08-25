@@ -153,6 +153,8 @@ namespace DaocLauncher
 
         private void ClickedImportToons(object sender, RoutedEventArgs e)
         {
+            var targetUC = new ImportToons();
+            mainContent.Content = targetUC;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
