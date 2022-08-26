@@ -402,8 +402,8 @@ namespace DaocLauncher
 
         ~Dashboard()
         {
-            var hitit = 1;
             MacroSets.Clear();
+            ActiveMacroSet = null;
         }
     }
 }

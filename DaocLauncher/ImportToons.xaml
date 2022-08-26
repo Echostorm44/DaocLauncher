@@ -24,7 +24,13 @@
             <Button x:Name="btnImport" Content="Import" Width="100" HorizontalAlignment="Right" FontSize="16" Grid.Column="2" Click="btnImport_Click"></Button>
         </Grid>        
         <TextBox Name="txtPasteBox" Grid.Row="1" Margin="0,15,0,0" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap"></TextBox>
-        <Button x:Name="btnImportSelected" Content="Import Selected" HorizontalAlignment="Right" Click="btnImportSelected_Click" Grid.Row="2" FontSize="16" Visibility="Hidden"></Button>
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <TextBlock Text="Parent Account " VerticalAlignment="Center" FontSize="16" Margin="10,0,10,0"></TextBlock>
+            <ComboBox Name="ddlAccountNames" IsEditable="False" FontSize="16" MinWidth="200" VerticalAlignment="Center"
+                                      ItemsSource="{Binding AccountNames }" SelectionChanged="ddlAccountNames_SelectionChanged"
+                                      Padding="6,3,0,3" Margin="0,0,15,0"/>
+            <Button x:Name="btnImportSelected" Content="Import Selected" HorizontalAlignment="Right" Click="btnImportSelected_Click" FontSize="16" Visibility="Hidden" VerticalAlignment="Center"></Button>
+        </StackPanel>        
         <ListBox ItemsSource="{Binding MyToons}" Grid.Row="3" Margin="0,10,0,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>

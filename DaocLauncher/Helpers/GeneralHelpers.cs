@@ -74,7 +74,6 @@ namespace DaocLauncher.Helpers
             else
             {
                 myMacros = JsonSerializer.Deserialize<List<MacroSet>>(rawMacros) ?? new List<MacroSet>() { };
-                //myMacros = Newtonsoft.Json.JsonConvert.DeserializeObject<List<MacroSet>>(rawMacros) ?? new List<MacroSet>() { };
             }
             return myMacros;
         }
@@ -94,7 +93,6 @@ namespace DaocLauncher.Helpers
             }
             string fileName = "macrosets.dat";
             var serialA = JsonSerializer.Serialize<List<MacroSet>>(macrosToSave);
-            //var serialA = Newtonsoft.Json.JsonConvert.SerializeObject(macrosToSave);
             WriteFile(fileName, serialA, false);
         }
 

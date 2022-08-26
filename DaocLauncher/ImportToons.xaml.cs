@@ -1,4 +1,5 @@
-﻿using DaocLauncher.Models;
+﻿using DaocLauncher.Helpers;
+using DaocLauncher.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,16 +24,27 @@ namespace DaocLauncher;
 public partial class ImportToons : UserControl
 {
     public ObservableCollection<ImportToon> MyToons { get; set; }
+    public ObservableCollection<string> AccountNames { get; set; }
 
     public ImportToons()
     {
         MyToons = new ObservableCollection<ImportToon>();
+        var accountList = GeneralHelpers.LoadAccountListFromDisk();
+        AccountNames = new ObservableCollection<string>();
+        foreach(var item in accountList.MyAccounts)
+        {
+            AccountNames.Add(item.Name ?? "NA");
+        }
         InitializeComponent();
         this.DataContext = this;
     }
 
     private void btnInstructions_Click(object sender, RoutedEventArgs e)
     {
+        var myProcess = new System.Diagnostics.Process();
+        myProcess.StartInfo.UseShellExecute = true;
+        myProcess.StartInfo.FileName = "https://github.com/Echostorm44/DaocLauncher/wiki/Importing-Characters";
+        myProcess.Start();
     }
 
     private void btnImport_Click(object sender, RoutedEventArgs e)
@@ -58,15 +70,52 @@ public partial class ImportToons : UserControl
                 toon.Class = items[6].Trim();
                 MyToons.Add(toon);
             }
+            if(MyToons.Count > 0 && ddlAccountNames.SelectedValue != null)
+            {
+                btnImportSelected.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                btnImportSelected.Visibility = Visibility.Hidden;
+            }
         }
     }
 
     private void btnImportSelected_Click(object sender, RoutedEventArgs e)
     {
         // Load existing toons to check for dupes
-
+        if(ddlAccountNames.SelectedValue == null)
+        {
+            return;
+        }
+        var existingToons = GeneralHelpers.LoadCharactersFromDisk();
         foreach(var item in MyToons)
         {
+            if(existingToons.Any(a => a.Name == item.Name) || !item.IsSelected)
+            {
+                continue;
+            }
+            var toon = new DaocCharacter();
+            toon.Name = item.Name;
+            toon.Server = item.ServerName;
+            toon.Class = item.Class;
+            toon.ParentAccountName = ddlAccountNames.SelectedValue.ToString();
+            existingToons.Add(toon);
+        }
+        GeneralHelpers.SaveCharactersToDisk(existingToons.ToList());
+        MyToons.Clear();
+        MessageBox.Show("Selected Toons Added!");
+    }
+
+    private void ddlAccountNames_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if(MyToons.Count > 0 && ddlAccountNames.SelectedValue != null)
+        {
+            btnImportSelected.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            btnImportSelected.Visibility = Visibility.Hidden;
         }
     }
 }
