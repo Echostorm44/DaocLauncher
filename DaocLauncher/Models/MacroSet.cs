@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DaocLauncher.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -6,10 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Interop;
-using DaocLauncher.Helpers;
+
 namespace DaocLauncher.Models
 {
-    public class MacroSet : INotifyPropertyChanged
+    public class MacroSet : INotifyPropertyChanged, IDisposable
     {
         string name;
         public string Name
@@ -17,7 +18,7 @@ namespace DaocLauncher.Models
             get => name;
             set
             {
-                if (name == value)
+                if(name == value)
                 {
                     return;
                 }
@@ -36,7 +37,7 @@ namespace DaocLauncher.Models
             get => categoryGroups;
             set
             {
-                if (categoryGroups == value)
+                if(categoryGroups == value)
                 {
                     return;
                 }
@@ -47,10 +48,7 @@ namespace DaocLauncher.Models
         }
         public ObservableCollection<HotKey> HotKeyCollection { get; set; }
 
-        public bool ListeningForHotkeys
-        {
-            get; set;
-        }
+        public bool ListeningForHotkeys { get; set; }
         public const int WmHotKey = 0x0312;
 
         public MacroSet(string name, Dictionary<string, ObservableCollection<string>> categoryGroups, ObservableCollection<HotKey> hotKeyCollection)
@@ -59,28 +57,32 @@ namespace DaocLauncher.Models
             CategoryGroups = categoryGroups;
             HotKeyCollection = hotKeyCollection;
             ListeningForHotkeys = false;
-            ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);            
+        }
+
+        public void StartMeUp()
+        {
+            ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
         }
 
         private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
         {
-            if (ListeningForHotkeys)
+            if(ListeningForHotkeys)
             {
-                if (!handled)
+                if(!handled)
                 {
-                    if (msg.message == WmHotKey)
+                    if(msg.message == WmHotKey)
                     {
                         var handledKey = (int)msg.wParam;
                         var targetKey = HotKeyCollection.SingleOrDefault(a => a.Id == handledKey);
-                        if (targetKey != null)
+                        if(targetKey != null)
                         {
-                            if (targetKey.HotKeyActionEvent != null)
+                            if(targetKey.HotKeyActionEvent != null)
                             {
                                 handled = true;
-                                targetKey.HotKeyActionEvent.Invoke(targetKey);                                
-                            }                            
-                        }                        
-                    }                    
+                                targetKey.HotKeyActionEvent.Invoke(targetKey);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -89,14 +91,14 @@ namespace DaocLauncher.Models
         {
             var catGroups = new Dictionary<string, ObservableCollection<string>>();
             var hotKeys = new ObservableCollection<HotKey>();
-            foreach (var cat in CategoryGroups)
+            foreach(var cat in CategoryGroups)
             {
                 catGroups.Add(cat.Key, cat.Value);
             }
-            foreach (var hot in HotKeyCollection)
+            foreach(var hot in HotKeyCollection)
             {
                 var triggerActs = new ObservableCollection<HotKeyAction>();
-                foreach (var act in hot.TriggeredActions)
+                foreach(var act in hot.TriggeredActions)
                 {
                     triggerActs.Add(act);
                 }
@@ -107,5 +109,15 @@ namespace DaocLauncher.Models
             return result;
         }
 
+        public void Dispose()
+        {
+            ListeningForHotkeys = false;
+            ComponentDispatcher.ThreadFilterMessage -= new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
+            foreach(var item in this.HotKeyCollection)
+            {
+                item.Dispose();
+            }
+            this.HotKeyCollection.Clear();
+        }
     }
 }

@@ -5,6 +5,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using WindowsInput;
 
 namespace DaocLauncher.Helpers
 {
@@ -21,7 +23,7 @@ namespace DaocLauncher.Helpers
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern uint MapVirtualKey(uint uCode, uint uMapType);
-        
+
         const uint WM_KEYDOWN = 0x0100;
         const uint WM_KEYUP = 0x0101;
         const uint WM_CHAR = 0x0102;
@@ -31,6 +33,9 @@ namespace DaocLauncher.Helpers
         object sendLock = 1;
 
 
+        [DllImport("user32.dll", SetLastError = true)]
+        static extern IntPtr SetFocus(IntPtr hWnd);
+
         /// <summary>
         /// Send keys to target window
         /// </summary>
@@ -38,8 +43,8 @@ namespace DaocLauncher.Helpers
         /// <param name="key"></param>
         /// <param name="modiferKey">VirtualKeyCode like Shift, Alt or Control</param>
         public void SendThoseKeysSucka(IntPtr targetWindow, VirtualKeyCode key, VirtualKeyCode? modiferKey, IntPtr returnFocusWindow)
-        {            
-            lock (sendLock)
+        {
+            lock(sendLock)
             {
                 SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
                 uint scanCode = MapVirtualKey((uint)key, 0);
@@ -48,9 +53,10 @@ namespace DaocLauncher.Helpers
                 //{
                 //    lParam |= 0x01000000;
                 //}
-                if (modiferKey != null)
+                if(modiferKey != null)
                 {
-                    keybd_event((byte)modiferKey, 0, WM_KEYDOWN, 0); ;
+                    //keybd_event((byte)modiferKey, 0, WM_KEYDOWN, 0);                    
+                    keybd_event((byte)modiferKey, (byte)MapVirtualKey((uint)(byte)modiferKey, 0), 0, 0); //Alt Press  
                     Thread.Sleep(1);
                 }
                 SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
@@ -58,30 +64,145 @@ namespace DaocLauncher.Helpers
                 SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
                 Thread.Sleep(1);
                 SendMessage(targetWindow, WM_KEYUP, (uint)key, lParam);
-                if (modiferKey != null)
+                if(modiferKey != null)
                 {
                     Thread.Sleep(1);
-                    keybd_event((byte)modiferKey, 0, WM_KEYUP, 0);
+                    //keybd_event((byte)modiferKey, 0, WM_KEYUP, 0);
+                    const uint KEYEVENTF_KEYUP = 0x0002;
+                    keybd_event((byte)modiferKey, (byte)MapVirtualKey((uint)(byte)modiferKey, 0), KEYEVENTF_KEYUP, 0);
                 }
                 SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
                 SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
             }
         }
 
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct KeyboardInput
+        {
+            public ushort wVk;
+            public ushort wScan;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct HardwareInput
+        {
+            public uint uMsg;
+            public ushort wParamL;
+            public ushort wParamH;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MouseInput
+        {
+            public int dx;
+            public int dy;
+            public uint mouseData;
+            public uint dwFlags;
+            public uint time;
+            public IntPtr dwExtraInfo;
+        }
+
+        [StructLayout(LayoutKind.Explicit)]
+        public struct InputUnion
+        {
+            [FieldOffset(0)] public MouseInput mi;
+            [FieldOffset(0)] public KeyboardInput ki;
+            [FieldOffset(0)] public HardwareInput hi;
+        }
+
+        public struct Input
+        {
+            public int type;
+            public InputUnion u;
+        }
+
+        [Flags]
+        public enum InputType
+        {
+            Mouse = 0,
+            Keyboard = 1,
+            Hardware = 2
+        }
+
+        [Flags]
+        public enum KeyEventF
+        {
+            KeyDown = 0x0000,
+            ExtendedKey = 0x0001,
+            KeyUp = 0x0002,
+            Unicode = 0x0004,
+            Scancode = 0x0008
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern uint SendInput(uint nInputs, Input[] pInputs, int cbSize);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetMessageExtraInfo();
+
+
         /// <summary>
-        /// Send keys to target window, this one is for putting keys into an already open chat box
+        /// Send keys to target window
         /// </summary>
+        /// <param name="targetWindow">Result of FindWindow or similar</param>
+        /// <param name="key"></param>
+        /// <param name="modiferKey">VirtualKeyCode like Shift, Alt or Control</param>
+        //public void SendThoseKeysSucka(IntPtr targetWindow, VirtualKeyCode key, VirtualKeyCode? modiferKey, IntPtr returnFocusWindow)
+        //{
+        //    lock(sendLock)
+        //    {
+        //        SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
+        //        uint scanCode = MapVirtualKey((uint)key, 0);
+        //        uint lParam = (0x00000001 | (scanCode << 16));
+        //        if(modiferKey != null)
+        //        {
+        //            InputSimulator inSim = new InputSimulator();
+        //            var transKey = (WindowsInput.Native.VirtualKeyCode)key;
+        //            var transMod = (WindowsInput.Native.VirtualKeyCode)modiferKey;
+
+        //            const uint KEYEVENTF_KEYUP = 0x0002;
+        //            keybd_event((int)VirtualKeyCode.ALT, (byte)MapVirtualKey((uint)VirtualKeyCode.ALT, 0), 0, 0); //Alt Press  
+        //            System.Threading.Thread.Sleep(20);
+        //            keybd_event((int)VirtualKeyCode.VK_3, (byte)MapVirtualKey((uint)VirtualKeyCode.VK_3, 0), 0, 0); // N1 Press  
+        //            System.Threading.Thread.Sleep(20);
+        //            keybd_event((int)VirtualKeyCode.VK_3, (byte)MapVirtualKey((uint)VirtualKeyCode.VK_3, 0), KEYEVENTF_KEYUP, 0); // N1 Release  
+        //            System.Threading.Thread.Sleep(20);
+        //            keybd_event((int)VirtualKeyCode.ALT, (byte)MapVirtualKey((uint)VirtualKeyCode.ALT, 0), KEYEVENTF_KEYUP, 0); // Alt Release  
+
+
+        //            //inSim.Keyboard.ModifiedKeyStroke(transMod, transKey);
+        //        }
+        //        else
+        //        {
+        //            SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
+        //            Thread.Sleep(1);
+        //            SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
+        //            Thread.Sleep(1);
+        //            SendMessage(targetWindow, WM_KEYUP, (uint)key, lParam);
+        //        }
+        //        SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
+        //        SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
+        //    }
+        //}
+
+        /// <summary>
+/// Send keys to target window, this one is for putting keys into an already open chat box
+/// </summary>
         /// <param name="targetWindow">Result of FindWindow or similar</param>
         /// <param name="keysToSend"></param>
         public void SendThoseChatKeysSucka(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
         {
-            lock (sendLock)
+            lock(sendLock)
             {
                 SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
-                foreach (var c in keysToSend.ToCharArray())
-                {                    
+                foreach(var c in keysToSend.ToCharArray())
+                {
                     uint scanCode = MapVirtualKey((uint)c, 0);
-                    uint lParam = (0x00000001 | (scanCode << 16));              
+                    uint lParam = (0x00000001 | (scanCode << 16));
                     SendMessage(targetWindow, WM_CHAR, (uint)c, lParam);
                 }
                 SendMessage(targetWindow, WM_KILLFOCUS, returnFocusWindow, IntPtr.Zero);
@@ -101,18 +222,29 @@ namespace DaocLauncher.Helpers
             SendMessage(targetWindow, WM_KEYUP, (uint)key, lParam);
         }
 
+        public void JustSendKey(IntPtr targetWindow, char key)
+        {
+            uint scanCode = MapVirtualKey((uint)key, 0);
+            uint lParam = (0x00000001 | (scanCode << 16));
+            SendMessage(targetWindow, WM_KEYDOWN, (uint)key, lParam);
+            Thread.Sleep(1);
+            SendMessage(targetWindow, WM_CHAR, (uint)key, lParam);
+            Thread.Sleep(1);
+            SendMessage(targetWindow, WM_KEYUP, (uint)key, lParam);
+        }
+
         /// <summary>
         /// Optimized version to prevent using more focus calls than needed to do a chat / command
         /// </summary>
         /// <param name="targetWindow">Result of FindWindow or similar</param>
-        /// <param name="keysToSend">eg /stick </param>
+        /// <param name="keysToSend">eg /stick</param>
         public void SendChatCommand(IntPtr targetWindow, string keysToSend, IntPtr returnFocusWindow)
         {
-            lock (sendLock)
+            lock(sendLock)
             {
                 SendMessage(targetWindow, WM_SETFOCUS, returnFocusWindow, IntPtr.Zero);
                 JustSendKey(targetWindow, VirtualKeyCode.RETURN);
-                foreach (var c in keysToSend.ToCharArray())
+                foreach(var c in keysToSend.ToCharArray())
                 {
                     uint scanCode = MapVirtualKey((uint)c, 0);
                     uint lParam = (0x00000001 | (scanCode << 16));
@@ -123,6 +255,5 @@ namespace DaocLauncher.Helpers
                 SendMessage(returnFocusWindow, WM_SETFOCUS, targetWindow, IntPtr.Zero);
             }
         }
-
     }
 }

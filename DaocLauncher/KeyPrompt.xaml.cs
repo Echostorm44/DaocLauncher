@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -27,7 +28,7 @@ namespace DaocLauncher
             get => labelText;
             set
             {
-                if (labelText == value)
+                if(labelText == value)
                 {
                     return;
                 }
@@ -49,7 +50,7 @@ namespace DaocLauncher
             ResponseTextBox.Focus();
         }
 
-        public KeyPrompt(string labelText,  char? targetCharacter)
+        public KeyPrompt(string labelText, char? targetCharacter)
         {
             LabelText = labelText;
             TargetCharacter = targetCharacter;
@@ -65,7 +66,7 @@ namespace DaocLauncher
             btnTryAgain.IsEnabled = false;
             btnOK.IsEnabled = false;
             ResponseTextBox.Text = "";
-            ResponseTextBox.IsEnabled = true;            
+            ResponseTextBox.IsEnabled = true;
         }
 
         private void btnOK_Click(object sender, RoutedEventArgs e)
@@ -73,14 +74,15 @@ namespace DaocLauncher
             DialogResult = true;
         }
 
-        private void ResponseTextBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        private void ResponseTextBox_PreviewKeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (TargetCharacter == null)
-            {                
+            if(TargetCharacter == null)
+            {
                 return;
             }
-            if (!string.IsNullOrEmpty(ResponseTextBox.Text) && TargetCharacter.HasValue && ResponseTextBox.Text.ToCharArray()[0] == TargetCharacter)
-            {   
+            if(!string.IsNullOrEmpty(ResponseTextBox.Text) && TargetCharacter.HasValue && ResponseTextBox.Text.ToCharArray()[0] == TargetCharacter)
+            {
+                KeyResult = e.Key;
                 DialogResult = true;
             }
             else
@@ -89,35 +91,35 @@ namespace DaocLauncher
             }
         }
 
-        private void ResponseTextBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void ResponseTextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (TargetCharacter == null)
+            if(TargetCharacter == null)
             {
                 e.Handled = true;
             }
             else
             {
-                return;            
+                return;
             }
             // Get modifiers and key data
             var modifiers = Keyboard.Modifiers;
             var key = e.Key;
 
             // When Alt is pressed, SystemKey is used instead
-            if (key == Key.System)
+            if(key == Key.System)
             {
                 key = e.SystemKey;
             }
 
             // Pressing delete, backspace or escape without modifiers clears the current value
-            if (modifiers == ModifierKeys.None &&
+            if(modifiers == ModifierKeys.None &&
                 (key == Key.Delete || key == Key.Back || key == Key.Escape))
             {
                 return;
             }
 
             // If no actual key was pressed - return
-            if (key == Key.LeftCtrl ||
+            if(key == Key.LeftCtrl ||
                 key == Key.RightCtrl ||
                 key == Key.LeftAlt ||
                 key == Key.RightAlt ||
@@ -133,15 +135,15 @@ namespace DaocLauncher
             }
 
             KeyResult = key;
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            if(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
             {
                 KeyModifier = KeyModifier.Shift;
             }
-            else if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+            else if(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
             {
                 KeyModifier = KeyModifier.Ctrl;
             }
-            else if (Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
+            else if(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt))
             {
                 KeyModifier = KeyModifier.Alt;
             }
@@ -150,7 +152,7 @@ namespace DaocLauncher
                 KeyModifier = KeyModifier.None;
             }
 
-            if (TargetCharacter == null)
+            if(TargetCharacter == null)
             {
                 LabelText = KeyResult.ToString() + " + " + KeyModifier.ToString();
                 btnOK.IsEnabled = true;

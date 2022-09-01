@@ -4,12 +4,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
+using System.Xml.Linq;
 
 namespace DaocLauncher.Helpers
 {
@@ -38,7 +41,7 @@ namespace DaocLauncher.Helpers
         ToggleAllHotkeysOnOff,
     }
 
-    public class HotKeyAction : IDragAndDropListBoxItem, ICloneable 
+    public class HotKeyAction : IDragAndDropListBoxItem, ICloneable
     {
         public string? GroupName { get; set; } // Casters, healers
         public int? Count { get; set; } // for use with things like pause
@@ -71,7 +74,7 @@ namespace DaocLauncher.Helpers
         public override string ToString()
         {
             string result = "";
-            switch (ActionType)
+            switch(ActionType)
             {
                 case HotkeyActionType.AssistActiveWindow:
                     result += $"{GroupName} Assist The Active Window";
@@ -109,7 +112,7 @@ namespace DaocLauncher.Helpers
                 case HotkeyActionType.ToggleAllHotkeysOnOff:
                     result += "Toggle Hotkeys";
                     break;
-            }            
+            }
             return result;
         }
 
@@ -120,7 +123,6 @@ namespace DaocLauncher.Helpers
 
         public HotKeyAction()
         {
-            
         }
     }
 
@@ -132,11 +134,19 @@ namespace DaocLauncher.Helpers
         [DllImport("user32.dll")]
         private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern short GlobalAddAtom(string lpString);
+
+        [DllImport("kernel32", SetLastError = true)]
+        public static extern short GlobalDeleteAtom(short nAtom);
+
         public const int WmHotKey = 0x0312;
 
         private bool AmIDisposed = false;
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        public List<HotKey> AllHotKeys { get; set; }
 
         Key key;
         public Key Key
@@ -144,7 +154,7 @@ namespace DaocLauncher.Helpers
             get => key;
             set
             {
-                if (key == value)
+                if(key == value)
                 {
                     return;
                 }
@@ -159,7 +169,7 @@ namespace DaocLauncher.Helpers
             get => keyModifiers;
             set
             {
-                if (keyModifiers == value)
+                if(keyModifiers == value)
                 {
                     return;
                 }
@@ -176,7 +186,7 @@ namespace DaocLauncher.Helpers
             get => description;
             set
             {
-                if (description == value)
+                if(description == value)
                 {
                     return;
                 }
@@ -189,7 +199,6 @@ namespace DaocLauncher.Helpers
 
         public HotKey()
         {
-
         }
 
         public HotKey(Key k, KeyModifier keyModifiers, string description, ObservableCollection<HotKeyAction> actions)
@@ -215,29 +224,42 @@ namespace DaocLauncher.Helpers
             int virtualKeyCode = KeyInterop.VirtualKeyFromKey(Key);
             Id = virtualKeyCode + ((int)KeyModifiers * 0x10000);
             bool result = RegisterHotKey(IntPtr.Zero, Id, (UInt32)KeyModifiers, (UInt32)virtualKeyCode);
+            if(!result)
+            {
+                var hr = Marshal.GetHRForLastWin32Error();
+                var ex = Marshal.GetExceptionForHR(hr);
+                var whatNow = "";
+            }
             //ComponentDispatcher.ThreadFilterMessage += new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
             return result;
         }
 
         public void Unregister()
         {
+            //ComponentDispatcher.ThreadFilterMessage -= new ThreadMessageEventHandler(ComponentDispatcherThreadFilterMessage);
             UnregisterHotKey(IntPtr.Zero, Id);
         }
 
-        //private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
-        //{
-        //    if (!handled)
-        //    {
-        //        if (msg.message == WmHotKey)
-        //        {
-        //            if (HotKeyActionEvent != null && (int)msg.wParam == Id)
-        //            {
-        //                HotKeyActionEvent.Invoke(this);
-        //            }
-        //            handled = true;
-        //        }
-        //    }
-        //}
+        private void ComponentDispatcherThreadFilterMessage(ref MSG msg, ref bool handled)
+        {
+            if(!handled)
+            {
+                if(msg.message == WmHotKey)
+                {
+                    var id = (int)msg.wParam;
+                    var targetKey = AllHotKeys.SingleOrDefault(a => a.Id == id);
+                    if(targetKey != null)
+                    {
+                        if(targetKey.HotKeyActionEvent != null)
+                        {
+                            handled = true;
+                            targetKey.HotKeyActionEvent.Invoke(targetKey);
+                        }
+                    }
+                    handled = true;
+                }
+            }
+        }
 
         // Implement IDisposable.
         // Do not make this method virtual.
@@ -263,11 +285,11 @@ namespace DaocLauncher.Helpers
         protected virtual void Dispose(bool disposing)
         {
             // Check to see if Dispose has already been called.
-            if (!this.AmIDisposed)
+            if(!this.AmIDisposed)
             {
                 // If disposing equals true, dispose all managed
                 // and unmanaged resources.
-                if (disposing)
+                if(disposing)
                 {
                     // Dispose managed resources.
                     Unregister();
@@ -278,6 +300,4 @@ namespace DaocLauncher.Helpers
             }
         }
     }
-
-    
 }

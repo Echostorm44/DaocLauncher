@@ -92,9 +92,9 @@ namespace DaocLauncher
 
         private void EditWindowSettings(object sender, RoutedEventArgs e)
         {
-            if(gridChars.SelectedItem != null)
+            if(e.Source != null)
             {
-                var targetCharacter = (DaocCharacter)gridChars.SelectedItem;
+                var targetCharacter = (DaocCharacter)((Button)e.Source).DataContext;
                 WindowStatsPrompt ws = new WindowStatsPrompt(targetCharacter);
                 ws.ShowDialog();
                 targetCharacter.WindowFullScreen = ws.IsFullScreen;
@@ -122,7 +122,7 @@ namespace DaocLauncher
                 var genSettings = GeneralHelpers.LoadGeneralSettingsFromDisk();
                 string gameFolder = genSettings.PathToGameDll.Replace("game.dll", "");
                 var charSymLinkFolder = $@"{genSettings.PathToSymbolicLinks}\{targetCharacter.Name}\";
-                var characterUserSettingsFolder = $@"{charSymLinkFolder}\copiedUserSettings\";
+                var characterUserSettingsFolder = $@"{charSymLinkFolder}copiedUserSettings\";
 
                 if(!Directory.Exists(charSymLinkFolder))
                 {
@@ -142,7 +142,6 @@ namespace DaocLauncher
                         var currentFolderName = item.Replace(gameFolder, "");
                         Directory.CreateSymbolicLink(charSymLinkFolder + currentFolderName, item);
                     }
-                    // Ok, the Symlinks are ready, we just need to add a Paths file && a new folder to hold out user.dat && other stuff like char inis && edit the user.dat with our resolutionsettings                    
                     if(!Directory.Exists(characterUserSettingsFolder))
                     {
                         Directory.CreateDirectory(characterUserSettingsFolder);
@@ -159,16 +158,17 @@ namespace DaocLauncher
                     }
                     // change user.dat filename then iterate through old user.dat writing lines && occasionally changing a value for resolution && windowed writing to a new user.dat
                     UpdateUserDat(targetCharacter, characterUserSettingsFolder);
-                    using(TextWriter tw = new StreamWriter(charSymLinkFolder + "paths.dat", false))
-                    {
-                        tw.WriteLine("[paths]");
-                        tw.WriteLine($@"settings={characterUserSettingsFolder}");
-                    }
                 }
                 else
                 {
                     File.Copy(characterUserSettingsFolder + "user.dat", characterUserSettingsFolder + "oldUser.dat.old", true);
                     UpdateUserDat(targetCharacter, characterUserSettingsFolder);
+                }
+                // Ok, the Symlinks are ready, we just need to add a Paths file && a new folder to hold out user.dat && other stuff like char inis && edit the user.dat with our resolutionsettings 
+                using(TextWriter tw = new StreamWriter(charSymLinkFolder + "paths.dat", false))
+                {
+                    tw.WriteLine("[paths]");
+                    tw.WriteLine($@"settings={characterUserSettingsFolder}");
                 }
             }
         }

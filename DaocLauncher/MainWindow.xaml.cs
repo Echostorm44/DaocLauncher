@@ -115,7 +115,7 @@ namespace DaocLauncher
 
         private void ClickedHome(object sender, RoutedEventArgs e)
         {
-            var targetUC = new Dashboard(mmenu);
+            var targetUC = new Dashboard(mmenu, this);
             mainContent.Content = targetUC;
         }
 
@@ -159,7 +159,7 @@ namespace DaocLauncher
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var targetUC = new Dashboard(mmenu);
+            var targetUC = new Dashboard(mmenu, this);
             mainContent.Content = targetUC;
         }
     }
