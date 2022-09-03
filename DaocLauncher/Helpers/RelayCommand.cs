@@ -2,31 +2,41 @@
 using System.Linq;
 using System.Windows.Input;
 
-namespace DaocLauncher
-{
-    public class RelayCommand : ICommand
-    {
-        readonly Action<object> execute;
-        readonly Predicate<object> canExecute;
-        public RelayCommand(Action<object> execute) : this(execute, null) { }
-        public RelayCommand(Action<object> execute, Predicate<object> canExecute)
-        {
-            if (execute == null)
-            {
-                throw new ArgumentNullException("execute");
-            }
+namespace DaocLauncher;
 
-            this.execute = execute; this.canExecute = canExecute;
-        }
-        public bool CanExecute(object parameter)
+public class RelayCommand : ICommand
+{
+    readonly Action<object> execute;
+    readonly Predicate<object> canExecute;
+
+    public RelayCommand(Action<object> execute) : this(execute, null)
+    {
+    }
+
+    public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+    {
+        if(execute == null)
         {
-            return canExecute == null ? true : canExecute(parameter);
+            throw new ArgumentNullException("execute");
         }
-        public event EventHandler CanExecuteChanged
-        {
-            add { CommandManager.RequerySuggested += value; }
-            remove { CommandManager.RequerySuggested -= value; }
-        }
-        public void Execute(object parameter) { execute(parameter); }
+
+        this.execute = execute;
+        this.canExecute = canExecute;
+    }
+
+    public bool CanExecute(object parameter)
+    {
+        return canExecute == null ? true : canExecute(parameter);
+    }
+
+    public event EventHandler CanExecuteChanged
+    {
+        add { CommandManager.RequerySuggested += value; }
+        remove { CommandManager.RequerySuggested -= value; }
+    }
+
+    public void Execute(object parameter)
+    {
+        execute(parameter);
     }
 }

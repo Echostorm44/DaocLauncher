@@ -12,56 +12,51 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DaocLauncher
+namespace DaocLauncher;
+
+partial class TextPrompt : Window
 {
-    partial class TextPrompt : Window
+    public string LabelText { get; set; }
+
+    public TextPrompt()
     {
-        public string LabelText { get; set; }
-        public TextPrompt()
-        {
-            LabelText = "Enter your command:";
-            InitializeComponent();
-            this.DataContext = this;
-            ResponseTextBox.Focus();
-        }
+        LabelText = "Enter your command:";
+        InitializeComponent();
+        this.DataContext = this;
+        ResponseTextBox.Focus();
+    }
 
-        public TextPrompt(string labelText, string preloadText = "")
+    public TextPrompt(string labelText, string preloadText = "")
+    {
+        LabelText = labelText;
+        InitializeComponent();
+        if(!string.IsNullOrEmpty(preloadText))
         {
-            
-            LabelText = labelText;
-            InitializeComponent();
-            if (!string.IsNullOrEmpty(preloadText))
-            {
-                ResponseText = preloadText;
-            }
-            this.DataContext = this;
-            this.Activate();
-            ResponseTextBox.Focus();
-            ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
+            ResponseText = preloadText;
         }
+        this.DataContext = this;
+        this.Activate();
+        ResponseTextBox.Focus();
+        ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
+    }
 
-        public string ResponseText
-        {
-            get { return ResponseTextBox.Text; }
-            set { ResponseTextBox.Text = value; }
-        }
+    public string ResponseText { get { return ResponseTextBox.Text; } set { ResponseTextBox.Text = value; } }
 
-        private void OKButton_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            DialogResult = true;
-        }
+    private void OKButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        DialogResult = true;
+    }
 
-        private void CancelButton_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            DialogResult = false;
-        }
+    private void CancelButton_Click(object sender, System.Windows.RoutedEventArgs e)
+    {
+        DialogResult = false;
+    }
 
-        private void ResponseTextBox_KeyDown(object sender, KeyEventArgs e)
+    private void ResponseTextBox_KeyDown(object sender, KeyEventArgs e)
+    {
+        if(e.Key == Key.Return)
         {
-            if (e.Key == Key.Return)
-            {
-                OKButton_Click(sender, e);
-            }
+            OKButton_Click(sender, e);
         }
     }
 }

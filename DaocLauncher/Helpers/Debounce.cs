@@ -4,49 +4,48 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
-namespace DaocLauncher.Helpers
+namespace DaocLauncher.Helpers;
+
+public class Debouncer
 {
-    public class Debouncer
+    private List<CancellationTokenSource> StepperCancelTokens = new List<CancellationTokenSource>();
+    private int MillisecondsToWait;
+    private readonly object MyLock = new object(); // Use a locking object to prevent the debouncer triggering again while the action is still running
+
+    public Debouncer(int millisecondsToWait = 300)
     {
-        private List<CancellationTokenSource> StepperCancelTokens = new List<CancellationTokenSource>();
-        private int MillisecondsToWait;
-        private readonly object MyLock = new object(); // Use a locking object to prevent the debouncer triggering again while the action is still running
+        this.MillisecondsToWait = millisecondsToWait;
+    }
 
-        public Debouncer(int millisecondsToWait = 300)
+    public void Debounce(Action funkyFunction)
+    {
+        CancelAllStepperTokens(); // Cancel all previous requests;
+        var cancelToken = new CancellationTokenSource();
+        lock(MyLock)
         {
-            this.MillisecondsToWait = millisecondsToWait;
+            StepperCancelTokens.Add(cancelToken);
         }
-
-        public void Debounce(Action funkyFuction)
+        Task.Delay(MillisecondsToWait, cancelToken.Token).ContinueWith(task =>
         {
-            CancelAllStepperTokens(); // Cancel all previous requests;
-            var cancelToken = new CancellationTokenSource();
-            lock (MyLock)
+            if(!cancelToken.IsCancellationRequested) // if it hasn't been cancelled
             {
-                StepperCancelTokens.Add(cancelToken);
+                CancelAllStepperTokens(); // Cancel any that remain (there shouldn't be any)
+                StepperCancelTokens = new List<CancellationTokenSource>();
+                lock(MyLock)
+                {
+                    funkyFunction();
+                }
             }
-            Task.Delay(MillisecondsToWait, cancelToken.Token).ContinueWith(task => 
-            {
-                if (!cancelToken.IsCancellationRequested) // if it hasn't been cancelled
-                {
-                    CancelAllStepperTokens(); // Cancel any that remain (there shouldn't be any)
-                    StepperCancelTokens = new List<CancellationTokenSource>(); 
-                    lock (MyLock)
-                    {
-                        funkyFuction(); 
-                    }
-                }
-            }, TaskScheduler.FromCurrentSynchronizationContext());
-        }
+        }, TaskScheduler.FromCurrentSynchronizationContext());
+    }
 
-        private void CancelAllStepperTokens()
+    private void CancelAllStepperTokens()
+    {
+        foreach(var token in StepperCancelTokens)
         {
-            foreach (var token in StepperCancelTokens)
+            if(!token.IsCancellationRequested)
             {
-                if (!token.IsCancellationRequested)
-                {
-                    token.Cancel();
-                }
+                token.Cancel();
             }
         }
     }

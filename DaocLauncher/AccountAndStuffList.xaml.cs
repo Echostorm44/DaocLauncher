@@ -13,16 +13,15 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DaocLauncher
+namespace DaocLauncher;
+
+/// <summary>
+/// Interaction logic for AccountAndStuffList.xaml
+/// </summary>
+public partial class AccountAndStuffList : UserControl
 {
-    /// <summary>
-    /// Interaction logic for AccountAndStuffList.xaml
-    /// </summary>
-    public partial class AccountAndStuffList : UserControl
+    public AccountAndStuffList()
     {
-        public AccountAndStuffList()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

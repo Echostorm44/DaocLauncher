@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DaocLauncher.Helpers
+namespace DaocLauncher.Helpers;
+
+public static class Extensions
 {
-    public static class Extensions
-    {
-        
-    }
 }

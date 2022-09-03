@@ -16,51 +16,51 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace DaocLauncher
+namespace DaocLauncher;
+
+/// <summary>
+/// Interaction logic for EditAccountsControl.xaml
+/// </summary>
+public partial class EditAccountsControl : UserControl
 {
-    /// <summary>
-    /// Interaction logic for EditAccountsControl.xaml
-    /// </summary>
-    public partial class EditAccountsControl : UserControl
+    public ObservableCollection<DaocAccount> AccountData { get; set; }
+    Helpers.Debouncer debouncer = new Debouncer(500);
+
+    public EditAccountsControl()
     {
-        public ObservableCollection<DaocAccount> AccountData { get; set; }
-        Helpers.Debouncer debouncer = new Debouncer(500);
-        public EditAccountsControl()
+        InitializeComponent();
+        var accountList = GeneralHelpers.LoadAccountListFromDisk();
+        AccountData = new ObservableCollection<DaocAccount>();
+        foreach(var item in accountList.MyAccounts)
         {
-            InitializeComponent();
-            var accountList = GeneralHelpers.LoadAccountListFromDisk();
-            AccountData = new ObservableCollection<DaocAccount>();
-            foreach (var item in accountList.MyAccounts)
-            {
-                AccountData.Add(item);
-            }
-            this.DataContext = this;
+            AccountData.Add(item);
         }
+        this.DataContext = this;
+    }
 
-        private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        debouncer.Debounce(() =>
         {
-            debouncer.Debounce(() =>
-            {
-                GeneralHelpers.SaveAccountListToDisk(AccountData.ToList());
-            });
+            GeneralHelpers.SaveAccountListToDisk(AccountData.ToList());
+        });
+    }
+
+    private void btnDelete_Click(object sender, RoutedEventArgs e)
+    {
+        if(gridAccounts.SelectedItem != null)
+        {
+            AccountData.Remove((DaocAccount)gridAccounts.SelectedItem);
+            GeneralHelpers.SaveAccountListToDisk(AccountData.ToList());
         }
+    }
 
-        private void btnDelete_Click(object sender, RoutedEventArgs e)
+    private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
+    {
+        if(e.OriginalSource.GetType() == typeof(DataGridCell))
         {
-            if (gridAccounts.SelectedItem != null)
-            {
-                AccountData.Remove((DaocAccount)gridAccounts.SelectedItem);
-                GeneralHelpers.SaveAccountListToDisk(AccountData.ToList());
-            }
-        }
-
-        private void DataGrid_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (e.OriginalSource.GetType() == typeof(DataGridCell))
-            {
-                DataGrid grid = (DataGrid)sender;
-                grid.BeginEdit(e);
-            }
+            DataGrid grid = (DataGrid)sender;
+            grid.BeginEdit(e);
         }
     }
 }
