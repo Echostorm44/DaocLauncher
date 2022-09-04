@@ -433,7 +433,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                             {
                                 foreach(var win in LoadedWindows)
                                 {
-                                    keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText, windowToReturnTo);
+                                    keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText.Replace("say ", ""), windowToReturnTo);
                                 }
                             }
                             TextPromptIsOpen = false;
@@ -441,7 +441,6 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                             break;
                         case HotkeyActionType.InviteAllWindowsToGroup:
                         {
-                            //Get active window pointer                                
                             var activeWindowPointer = LoadedWindows[activeWindowName];
                             foreach(var win in LoadedWindows)
                             {

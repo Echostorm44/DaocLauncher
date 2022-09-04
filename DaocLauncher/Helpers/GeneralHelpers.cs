@@ -68,17 +68,18 @@ public static class GeneralHelpers
         var rawShortcuts = GetFileContents(fileName, false);
         if(string.IsNullOrEmpty(rawShortcuts))
         {
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Emain", Text = "say emain" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Cruachan", Text = "say Cruachan" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Mount Collory", Text = "say Mount Collory" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Forest Sauvage", Text = "say Forest Sauvage" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Snowdonia", Text = "say Snowdonia" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Hadrian's", Text = "say Hadrian's" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Uppland", Text = "say Uppland" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Odin's Gate", Text = "say Odin's Gate" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Yggdra Forest", Text = "say Yggdra Forest" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Camelot", Text = "say Camelot" });
-            myShortcuts.Add(new QuickSayShortcut() { Title = "Tir na Nog", Text = "say Tir na Nog" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Movement", Text = "movement" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Emain", Text = "emain" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Cruachan", Text = "Cruachan" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Mount Collory", Text = "Mount Collory" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Forest Sauvage", Text = "Forest Sauvage" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Snowdonia", Text = "Snowdonia" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Hadrian's", Text = "Hadrian's" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Uppland", Text = "Uppland" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Odin's Gate", Text = "Odin's Gate" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Yggdra Forest", Text = "Yggdra Forest" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Camelot", Text = "Camelot" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Tir na Nog", Text = "Tir na Nog" });
             var serial = JsonSerializer.Serialize<List<QuickSayShortcut>>(myShortcuts);
             WriteFile(fileName, serial, false);
         }

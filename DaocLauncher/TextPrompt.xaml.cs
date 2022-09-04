@@ -28,7 +28,9 @@ partial class TextPrompt : Window, INotifyPropertyChanged
         QuickShortcuts = GeneralHelpers.LoadQuickSayShortcutsFromDisk();
         InitializeComponent();
         this.DataContext = this;
+        this.Activate();
         ResponseTextBox.Focus();
+        ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
     }
 
     public TextPrompt(string labelText, string preloadText = "")
@@ -85,7 +87,7 @@ partial class TextPrompt : Window, INotifyPropertyChanged
         if(e.Source != null)
         {
             var cut = (QuickSayShortcut)((Button)e.Source).DataContext;
-            ResponseText = cut.Text;
+            ResponseText = "say " + cut.Text;
             OKButton_Click(sender, e);
         }
     }
