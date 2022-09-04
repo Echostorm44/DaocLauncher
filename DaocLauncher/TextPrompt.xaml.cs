@@ -1,5 +1,8 @@
-﻿using System;
+﻿using DaocLauncher.Helpers;
+using DaocLauncher.Models;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +17,15 @@ using System.Windows.Shapes;
 
 namespace DaocLauncher;
 
-partial class TextPrompt : Window
+partial class TextPrompt : Window, INotifyPropertyChanged
 {
     public string LabelText { get; set; }
+    public List<QuickSayShortcut> QuickShortcuts { get; set; }
 
     public TextPrompt()
     {
         LabelText = "Enter your command:";
+        QuickShortcuts = GeneralHelpers.LoadQuickSayShortcutsFromDisk();
         InitializeComponent();
         this.DataContext = this;
         ResponseTextBox.Focus();
@@ -28,6 +33,7 @@ partial class TextPrompt : Window
 
     public TextPrompt(string labelText, string preloadText = "")
     {
+        QuickShortcuts = GeneralHelpers.LoadQuickSayShortcutsFromDisk();
         LabelText = labelText;
         InitializeComponent();
         if(!string.IsNullOrEmpty(preloadText))
@@ -40,7 +46,21 @@ partial class TextPrompt : Window
         ResponseTextBox.CaretIndex = ResponseTextBox.Text.Length;
     }
 
-    public string ResponseText { get { return ResponseTextBox.Text; } set { ResponseTextBox.Text = value; } }
+    public string ResponseText
+    {
+        get { return ResponseTextBox.Text; }
+        set
+        {
+            if(ResponseTextBox.Text == value)
+            {
+                return;
+            }
+            ResponseTextBox.Text = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ResponseText)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private void OKButton_Click(object sender, System.Windows.RoutedEventArgs e)
     {
@@ -56,6 +76,16 @@ partial class TextPrompt : Window
     {
         if(e.Key == Key.Return)
         {
+            OKButton_Click(sender, e);
+        }
+    }
+
+    private void ShortcutButtonClicked(object sender, RoutedEventArgs e)
+    {
+        if(e.Source != null)
+        {
+            var cut = (QuickSayShortcut)((Button)e.Source).DataContext;
+            ResponseText = cut.Text;
             OKButton_Click(sender, e);
         }
     }

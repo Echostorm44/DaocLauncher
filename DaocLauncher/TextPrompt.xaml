@@ -4,15 +4,29 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DaocLauncher"
-        mc:Ignorable="d" Height="200" Width="400" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
+        mc:Ignorable="d" Height="300" Width="520" ShowInTaskbar="False" WindowStartupLocation="CenterOwner"
         Topmost="True" WindowStyle="SingleBorderWindow" SizeToContent="WidthAndHeight">
     <StackPanel Margin="10">
         <TextBlock Text="{Binding LabelText}" FontSize="16" />
-        <TextBox x:Name="ResponseTextBox" Width="350" FontSize="16" KeyDown="ResponseTextBox_KeyDown" />
+        <TextBox x:Name="ResponseTextBox" Text="{Binding ResponseText}" Width="350" FontSize="16" KeyDown="ResponseTextBox_KeyDown" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <Button Content="OK" Click="OKButton_Click" Width="60" FontSize="16" Height="25" Margin="10" />
-            <Button Content="Cancel" Click="CancelButton_Click" Width="60" FontSize="16" Height="25" Margin="10" />
+            <Button Content="Cancel" Click="CancelButton_Click" Width="60" FontSize="16" Height="25" Margin="10" />            
         </StackPanel>
+        <ScrollViewer Width="500" Height="170">
+            <ItemsControl ItemsSource="{Binding QuickShortcuts}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding Title}" FontSize="15" Margin="2" Click="ShortcutButtonClicked"></Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </StackPanel>
 </Window>
 

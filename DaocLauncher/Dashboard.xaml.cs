@@ -287,7 +287,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                     }
                         break;
                 }
-                if(hotKey.Key == Key.Enter || hotKey.Key == Key.Return)
+                if(hotKey.Key == Key.Enter || hotKey.Key == Key.Return || hotKey.Key == MainWindow.GenSettings!.WackKey || hotKey.Key == Key.R)
                 {
                     var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
                     keySender.SendThoseKeysSucka(activeWindow, translation, null, activeWindow);

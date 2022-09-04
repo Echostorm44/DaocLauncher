@@ -60,6 +60,42 @@ public static class GeneralHelpers
         return Encoding.Unicode.GetString(decryptedData);
     }
 
+    public static List<QuickSayShortcut> LoadQuickSayShortcutsFromDisk()
+    {
+        string fileName = "quicksaveshortcuts.dat";
+        var myShortcuts = new List<QuickSayShortcut>();
+
+        var rawShortcuts = GetFileContents(fileName, false);
+        if(string.IsNullOrEmpty(rawShortcuts))
+        {
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Emain", Text = "say emain" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Cruachan", Text = "say Cruachan" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Mount Collory", Text = "say Mount Collory" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Forest Sauvage", Text = "say Forest Sauvage" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Snowdonia", Text = "say Snowdonia" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Hadrian's", Text = "say Hadrian's" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Uppland", Text = "say Uppland" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Odin's Gate", Text = "say Odin's Gate" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Yggdra Forest", Text = "say Yggdra Forest" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Camelot", Text = "say Camelot" });
+            myShortcuts.Add(new QuickSayShortcut() { Title = "Tir na Nog", Text = "say Tir na Nog" });
+            var serial = JsonSerializer.Serialize<List<QuickSayShortcut>>(myShortcuts);
+            WriteFile(fileName, serial, false);
+        }
+        else
+        {
+            myShortcuts = JsonSerializer.Deserialize<List<QuickSayShortcut>>(rawShortcuts) ?? new List<QuickSayShortcut>() { };
+        }
+        return myShortcuts;
+    }
+
+    public static void SaveQuickSayShortcutsToDisk(List<QuickSayShortcut> shorts)
+    {
+        string fileName = "quicksaveshortcuts.dat";
+        var serialA = JsonSerializer.Serialize<List<QuickSayShortcut>>(shorts);
+        WriteFile(fileName, serialA, false);
+    }
+
     public static List<MacroSet> LoadMacroSetsFromDisk()
     {
         string fileName = "macrosets.dat";
