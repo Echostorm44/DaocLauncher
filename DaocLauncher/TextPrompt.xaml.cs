@@ -87,7 +87,7 @@ partial class TextPrompt : Window, INotifyPropertyChanged
         if(e.Source != null)
         {
             var cut = (QuickSayShortcut)((Button)e.Source).DataContext;
-            ResponseText = "say " + cut.Text;
+            ResponseText = cut.Text;
             OKButton_Click(sender, e);
         }
     }
