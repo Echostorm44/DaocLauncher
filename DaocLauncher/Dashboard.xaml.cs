@@ -269,6 +269,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
         {
             foreach(var act in hotKey.TriggeredActions)
             {
+                var previousChatMode = macrosInChatMode;
                 switch(act.ActionType)
                 {
                     case HotkeyActionType.DisableAllHotkeys:
@@ -287,15 +288,32 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                     }
                         break;
                 }
-                if(hotKey.Key == Key.Enter || hotKey.Key == Key.Return || hotKey.Key == MainWindow.GenSettings!.WackKey || hotKey.Key == Key.R)
+                if(previousChatMode)
                 {
-                    var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
-                    keySender.SendThoseKeysSucka(activeWindow, translation, null, activeWindow);
+                    if(hotKey.Key == Key.Enter || hotKey.Key == Key.Return)
+                    {
+                        var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
+                        keySender.SendThoseKeysSucka(activeWindow, translation, null, activeWindow);
+                    }
+                    else
+                    {
+                        var myChar = GetCharFromKey(hotKey.Key);
+                        keySender.JustSendKey(activeWindow, myChar);
+                    }
                 }
                 else
                 {
-                    var myChar = GetCharFromKey(hotKey.Key);
-                    keySender.JustSendKey(activeWindow, myChar);
+                    if(hotKey.Key == Key.Enter || hotKey.Key == Key.Return || hotKey.Key == MainWindow.GenSettings!.WackKey
+                    || hotKey.Key == Key.R || hotKey.Key == MainWindow.GenSettings!.SingleQuoteKey)
+                    {
+                        var translation = (VirtualKeyCode)KeyInterop.VirtualKeyFromKey(hotKey.Key);
+                        keySender.SendThoseKeysSucka(activeWindow, translation, null, activeWindow);
+                    }
+                    else
+                    {
+                        var myChar = GetCharFromKey(hotKey.Key);
+                        keySender.JustSendKey(activeWindow, myChar);
+                    }
                 }
             }
             return;
