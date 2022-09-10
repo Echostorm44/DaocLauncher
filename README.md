@@ -1,7 +1,13 @@
-This is a game launcher for the MMO Dark Age of Camelot
+This is a game launcher and hotkey runner for the MMO Dark Age of Camelot
 
-I'm writing this because existing launchers I've seen are either buggy or are using libs I can't decompile to kill the mutex handles and it makes me nervous.  Also it's better to have everything in C#.
+I'm writing this because existing launchers I've seen are either closed source, paywalled or are using libs I can't decompile and of course it's better to have it all in C#.
 
-Currently the launcher can rename game instance windows and kill the mutex the game uses to prevent playing more than 2 accounts at once.
+Currently the launcher can launch and rename game instance windows and kill the mutex the game uses to prevent playing more than 2 accounts at once.
+![image](https://user-images.githubusercontent.com/107306362/189482495-db7f60ef-63d1-44e4-86be-a5aa4858ff1c.png)
 
-Plans are to add hotkey management, window size and screen management and anything else that seems fun.  Maybe some packet reading to do stats.
+Import your characters from https://accounts.eamythic.com/subscription/list
+![image](https://user-images.githubusercontent.com/107306362/189482576-18aab038-8269-4053-a1a7-7d3c4954329c.png)
+
+Manage and run hotkeys that allow you to play multiple toons at once
+Set the starting position, size and resolution of your windows when they are launched.
+
