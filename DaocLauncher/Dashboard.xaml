@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DaocLauncher"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
-    <ScrollViewer>
+             d:DesignHeight="500" d:DesignWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
     <StackPanel Orientation="Vertical" CanVerticallyScroll="True" VerticalAlignment="Top">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Macro Sets" FontSize="16" Margin="10,0"></TextBlock>
@@ -21,7 +21,7 @@
             </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Accounts" FontSize="16" HorizontalAlignment="Center"></TextBlock>
-            <ListView x:Name="lstMyAccounts" ItemsSource="{Binding Path=Accounts}">
+            <ListView x:Name="lstMyAccounts" ItemsSource="{Binding Path=Accounts}" MaxHeight="200">
                 <ListView.View>
                     <GridView x:Name="GridView2">
                         <GridViewColumn Width="Auto">
@@ -72,7 +72,7 @@
         </StackPanel>
         <StackPanel Orientation="Vertical">
             <TextBlock Text="Characters" FontSize="16" HorizontalAlignment="Center"></TextBlock>
-            <ListView x:Name="lstCharacters" ItemsSource="{Binding Path=AllCharacters}">
+            <ListView x:Name="lstCharacters" ItemsSource="{Binding Path=AllCharacters}" MaxHeight="200">
                 <ListView.View>
                     <GridView x:Name="GridView1">
                         <GridViewColumn Width="Auto">

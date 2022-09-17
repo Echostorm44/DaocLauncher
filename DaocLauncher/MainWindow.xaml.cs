@@ -84,7 +84,7 @@ public partial class MainWindow : Window
             var gameLoc = foo.ShowDialog();
             if(gameLoc == System.Windows.Forms.DialogResult.OK)
             {
-                GenSettings.PathToGameDll = foo.SelectedPath;
+                GenSettings.PathToSymbolicLinks = foo.SelectedPath;
                 GeneralHelpers.SaveGeneralSettingsToDisk(GenSettings);
             }
         }
@@ -160,6 +160,12 @@ public partial class MainWindow : Window
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         var targetUC = new Dashboard(mmenu);
+        mainContent.Content = targetUC;
+    }
+
+    private void ClickedSettings(object sender, RoutedEventArgs e)
+    {
+        var targetUC = new Settings();
         mainContent.Content = targetUC;
     }
 }

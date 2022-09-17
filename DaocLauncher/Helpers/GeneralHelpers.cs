@@ -106,7 +106,7 @@ public static class GeneralHelpers
         if(string.IsNullOrEmpty(rawMacros))
         {
             var serial = JsonSerializer.Serialize<List<MacroSet>>(myMacros);
-            WriteFile(fileName, serial, true);
+            WriteFile(fileName, serial, false);
         }
         else
         {
@@ -227,11 +227,13 @@ public static class GeneralHelpers
         string defaultGameDLLPath = @"C:\Program Files(x86)\Electronic Arts\Dark Age of Camelot\game.dll";
         string symbolicLinkFolderRootPath = @"c:\DaocSymbolicLinkedFolders\";
 
+
         var settings = GetFileContents(fileName, false);
         GeneralSettings mySettings = new GeneralSettings();
         if(string.IsNullOrEmpty(settings))
         {
-            mySettings = new GeneralSettings() { PathToGameDll = defaultGameDLLPath, PathToSymbolicLinks = symbolicLinkFolderRootPath, IsFirstTime = true };
+            mySettings = new GeneralSettings() { PathToGameDll = defaultGameDLLPath, PathToSymbolicLinks = symbolicLinkFolderRootPath, 
+                IsFirstTime = true };
             var serialGS = JsonSerializer.Serialize<GeneralSettings>(mySettings);
             WriteFile(fileName, serialGS, false);
         }

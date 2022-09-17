@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="DaocLauncher.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:DaocLauncher"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <ScrollViewer>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto" MaxWidth="400"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Path To Game dll" Grid.Column="0" Grid.Row="0" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="Path To SymLinks" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="Path To User Settings" Grid.Column="0" Grid.Row="2" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="/ Key Mapping" Grid.Column="0" Grid.Row="3" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="' Key Mapping" Grid.Column="0" Grid.Row="4" Margin="0,0,5,5" FontSize="16"></TextBlock>
+
+            <TextBlock Text="{Binding DllPath}" Grid.Column="1" Grid.Row="0" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="{Binding SymLinkPath}" Grid.Column="1" Grid.Row="1" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="{Binding UserDataPath}" Grid.Column="1" Grid.Row="2" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="{Binding WackKeyMap}" Grid.Column="1" Grid.Row="3" Margin="0,0,5,5" FontSize="16"></TextBlock>
+            <TextBlock Text="{Binding SingleQuoteKeyMap}" Grid.Column="1" Grid.Row="4" Margin="0,0,5,5" FontSize="16"></TextBlock>
+
+            <Button Content="Browse" Grid.Column="2" Grid.Row="0" Margin="0,0,5,5" FontSize="16" Click="SetDllPathButtonClicked"></Button>
+            <Button Content="Browse" Grid.Column="2" Grid.Row="1" Margin="0,0,5,5" FontSize="16" Click="SetSymLinkPathButtonClicked"></Button>
+            <Button Content="Browse" Grid.Column="2" Grid.Row="2" Margin="0,0,5,5" FontSize="16" Click="SetUserDataPathButtonClicked"></Button>
+            <Button Content="Set" Grid.Column="2" Grid.Row="3" Margin="0,0,5,5" FontSize="16" Click="SetWackKeyButtonClicked"></Button>
+            <Button Content="Set" Grid.Column="2" Grid.Row="4" Margin="0,0,5,5" FontSize="16" Click="SetSingleQuoteButtonClicked"></Button>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

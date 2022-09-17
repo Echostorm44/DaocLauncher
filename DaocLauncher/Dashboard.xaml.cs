@@ -409,6 +409,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                                     if(LoadedWindows.TryGetValue(name, out var winPtr))
                                     {
                                         keySender.SendThoseKeysSucka(winPtr, act.KeyToSend.Value, act.ModifierKeyToSend, windowToReturnTo);
+                                        Thread.Sleep(20);
                                     }
                                 }
                             }
@@ -431,6 +432,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                                 foreach(var win in LoadedWindows)
                                 {
                                     keySender.SendChatCommand(win.Value, act.Text, windowToReturnTo);
+                                    Thread.Sleep(120);
                                 }
                             }
                         }
@@ -440,6 +442,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                             foreach(var win in LoadedWindows)
                             {
                                 keySender.SendThoseKeysSucka(win.Value, act.KeyToSend.Value, act.ModifierKeyToSend, windowToReturnTo);
+                                Thread.Sleep(20);
                             }
                         }
                             break;
@@ -452,6 +455,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                                 foreach(var win in LoadedWindows)
                                 {
                                     keySender.SendChatCommand(win.Value, "/say " + dialog.ResponseText.Replace("say ", ""), windowToReturnTo);
+                                    Thread.Sleep(320);
                                 }
                             }
                             TextPromptIsOpen = false;
@@ -465,6 +469,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                                 if(win.Key != activeWindowName)
                                 {
                                     keySender.SendChatCommand(activeWindowPointer, "/invite " + win.Key, windowToReturnTo);
+                                    Thread.Sleep(20);
                                 }
                             }
                         }
@@ -478,6 +483,7 @@ public partial class Dashboard : System.Windows.Controls.UserControl, INotifyPro
                                 foreach(var win in LoadedWindows)
                                 {
                                     keySender.SendChatCommand(win.Value, "/" + dialog.ResponseText, windowToReturnTo);
+                                    Thread.Sleep(320);
                                 }
                             }
                             TextPromptIsOpen = false;
